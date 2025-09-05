@@ -1,70 +1,122 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# FullStack Media Collection Manager
 
-## Available Scripts
+**FullStack Media Collection Manager** is a scalable, modern full-stack web application for managing collections of **books, movies, and games**.  
+The app allows users to add, edit, delete, and analyze their media assets with a clean interface and robust backend.  
+It is designed with **modularity, testability, and best software development practices** in mind.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📑 Table of Contents
+- [Features](#features)  
+- [Technologies & Architecture](#technologies--architecture)  
+- [Installation & Setup](#installation--setup)  
+- [Usage](#usage)  
+- [API Documentation](#api-documentation)  
+- [Testing](#testing)  
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## ✨ Features
+- Manage separate collections for **books, movies, and games**.  
+- Perform full **CRUD operations**: add, list, update, and delete media items.  
+- **Image upload** support for media items (both base64 and file upload).  
+- Interactive **dashboard with statistics** by category, genre, and status.  
+- Comprehensive **test infrastructure** for both backend and frontend.  
+- Responsive, modern **UI with real-time updates**.  
+- RESTful API architecture.  
+- Modular, easily extensible structure.  
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🏗 Technologies & Architecture
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🔹 Backend
+- **Node.js** & **Express.js** → scalable server and REST API  
+- **MongoDB** → flexible NoSQL storage  
+- **dotenv** → environment variables  
+- **CORS** → secure cross-origin requests  
+- **Jest** → unit and integration testing  
+- **Playwright** → end-to-end testing  
 
-### `npm run build`
+### 🔹 Frontend
+- **React.js** (functional components + hooks)  
+- **Context API** → global state management  
+- **Chart.js** (or similar) → dynamic data visualization  
+- **Axios** or **Fetch API** → API communication  
+- **Jest** → frontend unit testing  
+- **Playwright** → end-to-end UI testing  
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ⚙ Installation & Setup
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### ✅ Requirements
+- **Node.js** (v18 or higher)  
+- **MongoDB** (local or cloud)  
+- **npm** or **yarn**  
 
-### `npm run eject`
+### 🔑 Environment Variables
+Create a `.env` file in the project root:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017
+```
+### 🔹 Backend Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+cd backend
+npm install
+npm start
+```
+- The backend API will be available at:http://localhost:5000
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 🔹 Frontend Setup
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+cd ..
+npm install
+npm start
+```
 
-## Learn More
+## 🚀 Usage
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Select a collection (books, movies, or games) from the main menu.
+- Use the Add button to create new media items.
+- Edit or delete items with controls on each media card.
+- View interactive charts & statistics on dashboard pages.
+- Upload images for book covers, movie posters, or game artwork.
+---
+## 📡 API Documentation
+### Main Endpoints
+```http
+GET    /api/books        → List all books
+POST   /api/books        → Add a new book
+PUT    /api/books/:id    → Update a book
+DELETE /api/books/:id    → Delete a book
+```
+- The same structure applies to /api/movies and /api/games.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Upload Endpoints
+```http
+POST /api/uploads
+```
+- Accepts images (base64 or file upload).
+- Returns uploaded file path or encoded string.
+- All endpoints use JSON format.
+- For detailed request/response examples, check the backend route files.
+---
+## 🧪 Testing
+- **Backend tests:** in /test, using Jest (unit + integration).
+- **Frontend tests:** using Jest + Playwright.
+- **End-to-End tests:** simulate real user scenarios.
+- All tests are CI/CD ready for automated quality assurance.
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Run tests:
+```bash
+npm test
+```
+Run Playwright E2E tests:
+```bash
+npx playwright test
+```
