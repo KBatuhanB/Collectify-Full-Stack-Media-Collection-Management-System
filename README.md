@@ -1,5 +1,10 @@
 # Collectify: Full-Stack Media Collection Management System
 
+<img width="1827" height="1032" alt="src2" src="https://github.com/user-attachments/assets/fc03c1d8-ad34-4abe-b6eb-7b0cb511fea3" />
+<img width="1813" height="1036" alt="src 3" src="https://github.com/user-attachments/assets/d13e869e-3c92-4e78-940a-d104232ac3e2" />
+<img width="1822" height="1036" alt="src1" src="https://github.com/user-attachments/assets/6f8e2759-86b0-451e-bdd0-879e648f880d" />
+<img width="1820" height="1035" alt="src4" src="https://github.com/user-attachments/assets/cee0bc69-ee8f-4e61-9e83-8f16d8711fcd" />
+
 **A comprehensive web application demonstrating modern full-stack development practices**
 
 > **Computer Engineering Portfolio Project** - Showcasing proficiency in React.js, Node.js, MongoDB, and modern web development methodologies.
@@ -33,7 +38,6 @@ This project demonstrates advanced full-stack development skills through a compr
 - [API Documentation](#-api-documentation)
 - [Testing Strategy](#-testing-strategy)
 - [Performance & Optimization](#-performance--optimization)
-- [Future Enhancements](#-future-enhancements)
 - [Learning Outcomes](#-learning-outcomes)
 
 ---
@@ -92,7 +96,7 @@ The application follows a **3-tier architecture** pattern with clear separation 
 
 ---
 
-## � Technology Stack
+## 🚀 Technology Stack
 
 ### **Frontend Technologies**
 | Technology | Version | Purpose |
@@ -146,7 +150,7 @@ The application follows a **3-tier architecture** pattern with clear separation 
 
 ---
 
-## � Installation & Setup
+## 🔹 Installation & Setup
 
 ### **Prerequisites**
 - Node.js (v18.0.0 or higher)
@@ -333,24 +337,6 @@ npm run test:all
 
 ---
 
-## 🔮 Future Enhancements
-
-### **Technical Improvements**
-- [ ] **Authentication System**: JWT-based user authentication
-- [ ] **Real-time Features**: WebSocket integration for live updates
-- [ ] **Caching Layer**: Redis implementation for improved performance
-- [ ] **Microservices**: Service decomposition for scalability
-- [ ] **Docker Containerization**: Development and deployment containers
-
-### **Feature Extensions**
-- [ ] **Social Features**: User sharing and recommendations
-- [ ] **Advanced Analytics**: Machine learning-based insights
-- [ ] **Mobile App**: React Native mobile application
-- [ ] **Offline Support**: Progressive Web App (PWA) capabilities
-- [ ] **Export/Import**: Data backup and migration features
-
----
-
 ## 📚 Learning Outcomes
 
 ### **Technical Skills Demonstrated**
@@ -377,7 +363,7 @@ npm run test:all
 
 ---
 
-## 👨‍� Developer Information
+##  🚀Developer Information
 
 **Developed by**: Computer Engineering Student  
 **Purpose**: Portfolio project demonstrating full-stack development expertise  
