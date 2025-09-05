@@ -365,20 +365,16 @@ npm run test:all
 
 ##  🚀Developer Information
 
-**Developed by**: Computer Engineering Student  
+**Developed by**: Kelami Batuhan Bölükbaşı 
 **Purpose**: Portfolio project demonstrating full-stack development expertise  
-**Academic Focus**: Modern web development technologies and methodologies  
 
 ### **Connect & Collaborate**
 - **GitHub**: [View Source Code](https://github.com/KBatuhanB/Collectify-Books-Movies-Games-Collection-Manager-Full-Stack-)
-- **LinkedIn**: Open to discussing technical implementation and career opportunities
-- **Email**: Available for technical questions and collaboration
+- **LinkedIn**: [Open to discussing technical implementation and career opportunities](https://www.linkedin.com/in/batuhan-b%C3%B6l%C3%BCkba%C5%9F%C4%B1-45b2b726b/)
+- **Email**: batuhankelami@gmail.com
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
