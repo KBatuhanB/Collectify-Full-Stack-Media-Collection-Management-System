@@ -251,7 +251,7 @@ export const VALIDATION_MESSAGES = {
 
 // Main Menu
 export const MAIN_MENU = {
-  TITLE: process.env.REACT_APP_MAIN_MENU_TITLE || 'Proje Koleksiyonu',
+  TITLE: process.env.REACT_APP_MAIN_MENU_TITLE || 'Collectify',
   SUBTITLE: process.env.REACT_APP_MAIN_MENU_SUBTITLE || 'Film, oyun ve kitap koleksiyonunuzu keşfedin',
   RECENT_ADDED: process.env.REACT_APP_RECENT_ADDED || 'Son Eklenenler',
   VIEW_ALL: process.env.REACT_APP_VIEW_ALL || 'Tümünü Gör',
