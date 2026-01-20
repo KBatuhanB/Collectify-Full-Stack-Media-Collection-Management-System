@@ -1,26 +1,26 @@
 import axios from 'axios';
 
-// MongoDB Helper - direkt veritabanı işlemleri için
+// MongoDB Helper - for direct database operations
 const { booksDB, closeDB } = require('./helpers/mongoHelper.js');
 
 // API URL
 const BOOKS_API_URL = 'http://localhost:5000/api/books';
 
-// Test verileri
+// Test data
 const testBooks = [
   {
-    title: 'Test Kitap 1',
-    author: 'Test Yazar 1',
+    title: 'Test Book 1',
+    author: 'Test Author 1',
     genre: 'Fiction',
-    status: 'Okundu',
+    status: 'Read',
     rating: 4.0,
     image: 'test-book-1.jpg'
   },
   {
-    title: 'Test Kitap 2',
-    author: 'Test Yazar 2',
+    title: 'Test Book 2',
+    author: 'Test Author 2',
     genre: 'Non-Fiction',
-    status: 'Okunacak',
+    status: 'To Read',
     rating: 0,
     image: 'test-book-2.jpg'
   }
@@ -28,25 +28,25 @@ const testBooks = [
 
 describe('Books API Integration Tests', () => {
   beforeEach(async () => {
-    // Her testten önce test verilerini temizle (direkt MongoDB ile)
+    // Clean up test data before each test (direct MongoDB)
     await booksDB.cleanupTestBooks();
   });
 
   afterAll(async () => {
-    // Test bitince test verilerini temizle
+    // Clean up test data after all tests
     await booksDB.cleanupTestBooks();
   await closeDB();
   });
 
   describe('Books API - POST /api/books', () => {
     test('should create a new book with valid data', async () => {
-      // Given - Geçerli test kitabı verisi
+      // Given - Valid test book data
       const bookData = testBooks[0];
 
-      // When - Gerçek API'yi çağır
+      // When - Call the real API
       const response = await axios.post(BOOKS_API_URL, bookData);
 
-      // Then - Gerçek response'u kontrol et
+      // Then - Check the real response
       expect(response).toMatchObject({
         status: 201,
         data: {
@@ -57,19 +57,19 @@ describe('Books API Integration Tests', () => {
       });
       expect(response.data).toHaveProperty('_id');
 
-      // Then - Kitabin gerçekten veritabanına eklendiğini mongoHelper ile kontrol et
+      // Then - Verify the book was actually added to the database using mongoHelper
       await expect(booksDB.findBookById(response.data._id.toString())).resolves.toMatchObject({title: bookData.title});
     });
 
     test('should return 400 for book data without required fields', async () => {
-      // Given - Gerekli title alanı eksik kitap verisi
+      // Given - Book data without required title field
       const incompleteBook = {
         author: 'Test Author',
         genre: 'Fiction',
-        status: 'Okundu'
+        status: 'Read'
       };
 
-      // When & Then - API çağrısı başarısız olmalı (title eksik)
+      // When & Then - API call should fail (title missing)
       await expect(axios.post(BOOKS_API_URL, incompleteBook)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -81,14 +81,14 @@ describe('Books API Integration Tests', () => {
     });
 
     test('should return 400 for book data without genre', async () => {
-      // Given - genre alanı eksik kitap verisi
+      // Given - Book data without genre field
       const incompleteBook = {
-        title: 'Test Kitap',
+        title: 'Test Book',
         author: 'Test Author',
-        status: 'Okundu'
+        status: 'Read'
       };
 
-      // When & Then - API çağrısı başarısız olmalı (genre eksik)
+      // When & Then - API call should fail (genre missing)
       await expect(axios.post(BOOKS_API_URL, incompleteBook)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -100,14 +100,14 @@ describe('Books API Integration Tests', () => {
     });
 
     test('should return 400 for book data without status', async () => {
-      // Given - status alanı eksik kitap verisi
+      // Given - Book data without status field
       const incompleteBook = {
-        title: 'Test Kitap',
+        title: 'Test Book',
         author: 'Test Author',
         genre: 'Fiction'
       };
 
-      // When & Then - API çağrısı başarısız olmalı (status eksik)
+      // When & Then - API call should fail (status missing)
       await expect(axios.post(BOOKS_API_URL, incompleteBook)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -121,20 +121,20 @@ describe('Books API Integration Tests', () => {
 
   describe('Books API - GET /api/books', () => {
     test('should return all books', async () => {
-      // Given - Test verilerini direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add test data directly with MongoDB (without API)
       const savedBook1 = await booksDB.insertBook(testBooks[0]);
       const savedBook2 = await booksDB.insertBook(testBooks[1]);
 
-      // Given - Verilerin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbBook1 = await booksDB.findBookById(savedBook1._id.toString());
       const dbBook2 = await booksDB.findBookById(savedBook2._id.toString());
       expect(dbBook1.title).toBe(testBooks[0].title);
       expect(dbBook2.title).toBe(testBooks[1].title);
 
-      // When - Gerçek API'yi çağır
+      // When - Call the real API
       const response = await axios.get(BOOKS_API_URL);
 
-      // Then - Test kitaplarının var olduğunu kontrol et
+      // Then - Verify test books exist
       expect(response.status).toBe(200);
       const testBookTitles = response.data.map(book => book.title);
       testBooks.forEach(testBook => {
@@ -143,16 +143,16 @@ describe('Books API Integration Tests', () => {
     });
 
     test('should return books array even when no test books exist', async () => {
-      // Given - Test dışı kitaplar olabilir ama test kitapları temizlenmiş
+      // Given - Non-test books may exist but test books are cleaned up
 
-      // When - API'yi çağır
+      // When - Call the API
       const response = await axios.get(BOOKS_API_URL);
 
-      // Then - Array döndürülmeli (test dışı kitaplar da dahil olabilir)
+      // Then - Array should be returned (may include non-test books)
       expect(response.status).toBe(200);
       expect(Array.isArray(response.data)).toBe(true);
       
-      // Then - Test kitaplarının olmadığını kontrol et
+      // Then - Verify test books don't exist
       const bookTitles = response.data.map(book => book.title);
       expect(bookTitles).not.toContain(testBooks[0].title);
       expect(bookTitles).not.toContain(testBooks[1].title);
@@ -161,18 +161,18 @@ describe('Books API Integration Tests', () => {
 
   describe('Books API - GET /api/books/:id', () => {
     test('should return a single book by ID', async () => {
-      // Given - Veritabanına direkt MongoDB ile test kitabı ekle (API kullanmadan)
+      // Given - Add test book directly with MongoDB (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
       
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbBook = await booksDB.findBookById(bookId);
       expect(dbBook.title).toBe(testBooks[0].title);
       
-      // When - ID ile belirli kitabı getir
+      // When - Get specific book by ID
       const response = await axios.get(`${BOOKS_API_URL}/${bookId}`);
 
-      // Then - Doğru kitap döndürülmeli
+      // Then - Correct book should be returned
       expect(response).toMatchObject({
         status: 200,
         data: {
@@ -184,45 +184,45 @@ describe('Books API Integration Tests', () => {
     });
 
     test('should return 404 for non-existent book ID', async () => {
-      // Given - Geçerli ama mevcut olmayan ObjectId
+      // Given - Valid but non-existent ObjectId
       const nonExistentId = '64a7b8c9d0e1f2a3b4c5d6e7';
 
-      // When & Then - API çağrısı 404 döndürmeli
+      // When & Then - API call should return 404
       await expect(axios.get(`${BOOKS_API_URL}/${nonExistentId}`)).rejects.toMatchObject({response: {status: 404}});
     });
 
     test('should return 400 for invalid ID format', async () => {
-      // Given - Geçersiz ObjectId formatı
+      // Given - Invalid ObjectId format
       const invalidId = 'invalid-book-id';
 
-      // When & Then - API çağrısı 400 döndürmeli
+      // When & Then - API call should return 400
       await expect(axios.get(`${BOOKS_API_URL}/${invalidId}`)).rejects.toMatchObject({response: {status: 400}});
     });
   });
 
   describe('Books API - PUT /api/books/:id', () => {
     test('should update an existing book', async () => {
-      // Given - Veritabanına direkt MongoDB ile test kitabı ekle (API kullanmadan)
+      // Given - Add test book directly with MongoDB (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
 
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbBook = await booksDB.findBookById(bookId);
       expect(dbBook.title).toBe(testBooks[0].title);
       expect(dbBook.author).toBe(testBooks[0].author);
 
       const updateData = {
-        title: 'Güncellenmiş Kitap',
-        author: 'Güncellenmiş Yazar',
+        title: 'Updated Book',
+        author: 'Updated Author',
         genre: 'Mystery',
-        status: 'Okundu',
+        status: 'Read',
         rating: 4.5
       };
 
-      // When - Kitabı güncelle
+      // When - Update the book
       const response = await axios.put(`${BOOKS_API_URL}/${bookId}`, updateData);
 
-      // Then - Güncellenmiş kitap döndürülmeli
+      // Then - Updated book should be returned
       expect(response).toMatchObject({
         status: 200,
         data: {
@@ -233,7 +233,7 @@ describe('Books API Integration Tests', () => {
         }
       });
 
-      // Then - Güncellemenin kalıcı olduğunu mongoHelper ile doğrula
+      // Then - Verify update is persistent using mongoHelper
       const dbBookAfterUpdate = await booksDB.findBookById(bookId);
       expect(dbBookAfterUpdate).toMatchObject({
         title: updateData.title,
@@ -242,26 +242,26 @@ describe('Books API Integration Tests', () => {
     });
 
     test('should return 404 for non-existent book ID', async () => {
-      // Given - Geçerli ama mevcut olmayan ObjectId ve güncelleme verisi
+      // Given - Valid but non-existent ObjectId and update data
       const nonExistentId = '64a7b8c9d0e1f2a3b4c5d6e7';
-      const updateData = { title: 'Updated Book', author: 'Updated Author', genre: 'Fiction', status: 'Okundu' };
+      const updateData = { title: 'Updated Book', author: 'Updated Author', genre: 'Fiction', status: 'Read' };
 
-      // When & Then - API çağrısı 404 döndürmeli
+      // When & Then - API call should return 404
       await expect(axios.put(`${BOOKS_API_URL}/${nonExistentId}`, updateData)).rejects.toMatchObject({response: {status: 404}});
     });
 
     test('should return 400 for invalid update data', async () => {
-      // Given - Direkt MongoDB ile geçerli kitap ekle ve geçersiz güncelleme verisi (API kullanmadan)
+      // Given - Add valid book directly with MongoDB and invalid update data (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
       
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbBook = await booksDB.findBookById(bookId);
       expect(dbBook.title).toBe(testBooks[0].title);
       
-      const invalidUpdateData = { title: '', author: '', genre: 'Fiction', status: 'Okundu' }; // Boş title
+      const invalidUpdateData = { title: '', author: '', genre: 'Fiction', status: 'Read' }; // Empty title
 
-      // When & Then - API çağrısı 400 döndürmeli ve spesifik hata mesajı
+      // When & Then - API call should return 400 with specific error message
       await expect(axios.put(`${BOOKS_API_URL}/${bookId}`, invalidUpdateData)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -275,18 +275,18 @@ describe('Books API Integration Tests', () => {
 
   describe('Books API - DELETE /api/books/:id', () => {
     test('should delete an existing book', async () => {
-      // Given - Veritabanına direkt MongoDB ile test kitabı ekle (API kullanmadan)
+      // Given - Add test book directly with MongoDB (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
 
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbBook = await booksDB.findBookById(bookId);
       expect(dbBook.title).toBe(testBooks[0].title);
 
-      // When - Kitabı sil
+      // When - Delete the book
       const response = await axios.delete(`${BOOKS_API_URL}/${bookId}`);
 
-      // Then - Başarılı silme response'u
+      // Then - Successful delete response
       expect(response).toMatchObject({
         status: 200,
         data: {
@@ -294,24 +294,24 @@ describe('Books API Integration Tests', () => {
         }
       });
 
-      // Then - Kitabın silindiğini mongoHelper ile doğrula
+      // Then - Verify book was deleted using mongoHelper
       const deletedBook = await booksDB.findBookById(bookId);
       expect(deletedBook).toBeNull();
     });
 
     test('should return 404 for non-existent book ID', async () => {
-      // Given - Geçerli ama mevcut olmayan ObjectId
+      // Given - Valid but non-existent ObjectId
       const nonExistentId = '64a7b8c9d0e1f2a3b4c5d6e7';
 
-      // When & Then - API çağrısı 404 döndürmeli
+      // When & Then - API call should return 404
       await expect(axios.delete(`${BOOKS_API_URL}/${nonExistentId}`)).rejects.toMatchObject({response: {status: 404}});
     });
 
     test('should return 400 for invalid book ID format', async () => {
-      // Given - Geçersiz ObjectId formatı
+      // Given - Invalid ObjectId format
       const invalidId = 'invalid-book-id-format';
 
-      // When & Then - API çağrısı 400 döndürmeli
+      // When & Then - API call should return 400
       await expect(axios.delete(`${BOOKS_API_URL}/${invalidId}`)).rejects.toMatchObject({
         response: {
           status: 400

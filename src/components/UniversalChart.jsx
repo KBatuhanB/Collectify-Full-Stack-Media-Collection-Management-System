@@ -19,15 +19,15 @@ ChartJS.register(
 );
 
 /**
- * Evrensel chart bileşeni - farklı chart tiplerini destekler
- * @param {Array} data - Chart için veri dizisi
- * @param {string} title - Chart başlığı
- * @param {string} type - Chart tipi ('pie', 'bar', 'line', 'doughnut')
- * @param {string} dataKey - Gruplamak için kullanılacak veri anahtarı
- * @param {Function} labelTransform - Label dönüştürme fonksiyonu
- * @param {Array} colors - Chart renkleri
- * @param {Object} chartOptions - Ek chart seçenekleri
- * @param {number} height - Chart yüksekliği
+ * Universal chart component - supports different chart types
+ * @param {Array} data - Data array for the chart
+ * @param {string} title - Chart title
+ * @param {string} type - Chart type ('pie', 'bar', 'line', 'doughnut')
+ * @param {string} dataKey - Data key to use for grouping
+ * @param {Function} labelTransform - Label transform function
+ * @param {Array} colors - Chart colors
+ * @param {Object} chartOptions - Additional chart options
+ * @param {number} height - Chart height
  */
 function UniversalChart({ 
   data = [], 
@@ -43,12 +43,12 @@ function UniversalChart({
   height = 300
 }) {
 
-  // Veriyi grupla ve say
+  // Group and count data
   const groupData = () => {
     if (!dataKey) return {};
     
     return data.reduce((acc, item) => {
-      const key = item[dataKey] || 'Belirtilmemiş';
+      const key = item[dataKey] || 'Unspecified';
       acc[key] = (acc[key] || 0) + 1;
       return acc;
     }, {});
@@ -58,7 +58,7 @@ function UniversalChart({
   const labels = Object.keys(groupedData).map(labelTransform);
   const values = Object.values(groupedData);
 
-  // Chart data objesi
+  // Chart data object
   const chartData = {
     labels,
     datasets: [
@@ -72,7 +72,7 @@ function UniversalChart({
     ],
   };
 
-  // Default chart seçenekleri
+  // Default chart options
   const defaultOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -106,10 +106,10 @@ function UniversalChart({
     } : undefined,
   };
 
-  // Seçenekleri birleştir
+  // Merge options
   const finalOptions = { ...defaultOptions, ...chartOptions };
 
-  // Chart tipine göre component seç
+  // Select component based on chart type
   const getChartComponent = () => {
     switch (type) {
       case 'bar':
@@ -124,7 +124,7 @@ function UniversalChart({
     }
   };
 
-  // Veri yoksa boş durum göster
+  // Show empty state if no data
   if (data.length === 0) {
     return (
       <Paper sx={{ p: 2, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

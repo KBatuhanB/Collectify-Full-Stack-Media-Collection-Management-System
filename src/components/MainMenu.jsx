@@ -10,19 +10,19 @@ import ProjectMiniCard from './ProjectMiniCard';
 function MainMenu({ onNavigate }) {
   const { movies, games, books } = useProject();
 
-  // Tüm projeleri birleştir ve tarihe göre sırala (son eklenenler önce)
+  // Combine all projects and sort by date (newest first)
   const allProjects = [
-    ...movies.map(m => ({ ...m, type: 'movie', typeName: 'Film/Dizi', icon: '🎬' })),
-    ...games.map(g => ({ ...g, type: 'game', typeName: 'Oyun', icon: '🎮' })),
-    ...books.map(b => ({ ...b, type: 'book', typeName: 'Kitap', icon: '📚' }))
+    ...movies.map(m => ({ ...m, type: 'movie', typeName: 'Movie/Series', icon: '🎬' })),
+    ...games.map(g => ({ ...g, type: 'game', typeName: 'Game', icon: '🎮' })),
+    ...books.map(b => ({ ...b, type: 'book', typeName: 'Book', icon: '📚' }))
   ].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
-  // Son 8 projeyi al
+  // Get the last 8 projects
   const recentProjects = allProjects.slice(0, 8);
 
   const CategoryRow = ({ title, items, type, icon, gradient, onViewAll }) => (
     <Box sx={{ mb: 4 }}>
-      {/* Kategori başlığı */}
+      {/* Category header */}
       <Box
         sx={{
           display: 'flex',
@@ -57,7 +57,7 @@ function MainMenu({ onNavigate }) {
               {title}
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              {items.length} öğe
+              {items.length} items
             </Typography>
           </Box>
         </Box>
@@ -86,7 +86,7 @@ function MainMenu({ onNavigate }) {
         </Button>
       </Box>
 
-      {/* İçerik kartları */}
+      {/* Content cards */}
       {items.length === 0 ? (
         <Box
           sx={{
@@ -104,7 +104,7 @@ function MainMenu({ onNavigate }) {
         >
           <Box sx={{ fontSize: '3rem', mb: 2, opacity: 0.5 }}>{icon}</Box>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-            {EMPTY_STATE_MESSAGES.NO_ITEMS || `Henüz ${title.toLowerCase()} eklenmemiş`}
+            {EMPTY_STATE_MESSAGES.NO_ITEMS || `No ${title.toLowerCase()} added yet`}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {EMPTY_STATE_MESSAGES.DESCRIPTION}
@@ -185,7 +185,7 @@ function MainMenu({ onNavigate }) {
                         {icon}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Resim yok
+                        No image
                       </Typography>
                     </Box>
                   </Box>
@@ -222,11 +222,11 @@ function MainMenu({ onNavigate }) {
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
                   {item.year && `${item.year} • `}
-                  {item.author || item.director || item.platform || 'Bilinmiyor'}
+                  {item.author || item.director || item.platform || 'Unknown'}
                 </Typography>
                 {item.rating > 0 && (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="caption" color="text.secondary">Puan:</Typography>
+                    <Typography variant="caption" color="text.secondary">Rating:</Typography>
                     <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
                       {item.rating}/5
                     </Typography>
@@ -242,7 +242,7 @@ function MainMenu({ onNavigate }) {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Ana Başlık */}
+      {/* Main Header */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography
           variant="h3"
@@ -266,7 +266,7 @@ function MainMenu({ onNavigate }) {
         </Typography>
       </Box>
 
-      {/* Son Eklenenler Bölümü */}
+      {/* Recently Added Section */}
       {recentProjects.length > 0 && (
         <Box sx={{ mb: 6 }}>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
@@ -303,10 +303,10 @@ function MainMenu({ onNavigate }) {
         </Box>
       )}
 
-      {/* Kategoriler - Yatay Satırlar */}
+      {/* Categories - Horizontal Rows */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 4, textAlign: 'center' }}>
-          🚀 {MAIN_MENU.EXPLORE_CATEGORIES}
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 4 }}>
+          📚 Your Collections
         </Typography>
 
         <CategoryRow

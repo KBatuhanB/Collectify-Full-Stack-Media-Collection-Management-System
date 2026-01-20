@@ -59,7 +59,7 @@ export function ProjectProvider({ children }) {
     fetchData('book');
   }, []);
 
-  // Proje ekleme fonksiyonu
+  // Add project function
   const addProject = async (project, type) => {
     setLoading(true);
     try {
@@ -77,7 +77,7 @@ export function ProjectProvider({ children }) {
     }
   };
 
-  // Proje güncelleme fonksiyonu
+  // Update project function
   const updateProject = async (id, updatedProject, type) => {
     setLoading(true);
     try {
@@ -99,7 +99,7 @@ export function ProjectProvider({ children }) {
     }
   };
 
-  // Proje silme fonksiyonu
+  // Delete project function
   const deleteProject = async (id, type) => {
     try {
       const api = getAPI(type);
@@ -113,7 +113,7 @@ export function ProjectProvider({ children }) {
     }
   };
 
-  // Türe göre proje alma
+  // Get projects by type
   const getProjectsByType = (type) => {
     switch (type) {
       case 'series': return movies;
@@ -123,7 +123,7 @@ export function ProjectProvider({ children }) {
     }
   };
 
-  // Aynı isimde proje var mı kontrolü
+  // Check if a project with the same title exists
   const isDuplicateTitle = (title, type) => {
     const projects = getProjectsByType(type);
     return projects.some(project => 
@@ -142,7 +142,7 @@ export function ProjectProvider({ children }) {
     getProjectsByType,
     fetchData,
     setLoading,
-    isDuplicateTitle, // yeni fonksiyon eklendi
+    isDuplicateTitle, // new function added
   };
 
   return (

@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
 // POST create new movie
 router.post('/', async (req, res) => {
   try {
-    // Zorunlu alanlar validation
+    // Required fields validation
     const { title, genre, status } = req.body;
     if (!title || typeof title !== 'string' || title.trim() === '') {
       return res.status(400).json({ message: 'Title is required and cannot be empty.' });
@@ -66,7 +66,7 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ message: 'Invalid movie ID' });
     }
     
-    // Zorunlu alanlar validation
+    // Required fields validation
     const { title, genre, status } = req.body;
     if (!title || typeof title !== 'string' || title.trim() === '') {
       return res.status(400).json({ message: 'Title is required and cannot be empty.' });

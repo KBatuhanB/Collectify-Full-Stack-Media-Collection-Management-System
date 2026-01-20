@@ -12,27 +12,27 @@ import { NAVIGATION } from '../config/constants';
 
 function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, showHeader = true }) {
   const tabs = [
-    { key: 'Dizi/Film', label: NAVIGATION.MOVIES },
-    { key: 'Oyun', label: NAVIGATION.GAMES },
-    { key: 'Kitap', label: NAVIGATION.BOOKS },
+    { key: 'Series', label: NAVIGATION.MOVIES },
+    { key: 'Game', label: NAVIGATION.GAMES },
+    { key: 'Book', label: NAVIGATION.BOOKS },
   ];
 
-  // Aktif tab'a göre renk paleti belirleme
+  // Determine color palette based on active tab
   const getColorPalette = () => {
     switch(activeTab) {
-      case 'Dizi/Film':
+      case 'Series':
         return {
           background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
           activeButton: 'linear-gradient(90deg, #e084ea 0%, #e44e5b 100%)',
           shadow: 'rgba(240, 147, 251, 0.3)'
         };
-      case 'Oyun':
+      case 'Game':
         return {
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           activeButton: 'linear-gradient(90deg, #5a6fd8 0%, #6a4190 100%)',
           shadow: 'rgba(102, 126, 234, 0.3)'
         };
-      case 'Kitap':
+      case 'Book':
         return {
           background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
           activeButton: 'linear-gradient(90deg, #3e9bfd 0%, #00e1fe 100%)',
@@ -49,9 +49,9 @@ function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, 
 
   const colorPalette = getColorPalette();
 
-  // Mouse ekranın üstüne gelince header'ı göster - Hook'u conditional render'dan önce çağır
+  // Show header when mouse moves to top of screen - Call hook before conditional render
   useEffect(() => {
-    // Eğer header gösterilmiyorsa event listener'ı ekleme
+    // Don't add event listener if header is not shown
     if (!showHeader) return;
 
     const header = document.getElementById('main-header');
@@ -61,7 +61,7 @@ function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, 
       if (e.clientY <= 30) {
         header.classList.add('header-visible');
       } else {
-        // Biraz gecikmeli gizle
+        // Hide with slight delay
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           header.classList.remove('header-visible');
@@ -75,7 +75,7 @@ function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, 
     };
   }, [showHeader]);
 
-  // showHeader false ise header'ı gösterme - Hook'lardan sonra conditional render
+  // Don't render header if showHeader is false - Conditional render after hooks
   if (!showHeader) return null;
 
   return (
@@ -111,7 +111,7 @@ function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, 
           px: { xs: 0.5, md: 2 },
         }}
       >
-        {/* Sol taraf - Home butonu */}
+        {/* Left side - Home button */}
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
           <IconButton
             onClick={onHomeClick}
@@ -135,7 +135,7 @@ function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, 
           </IconButton>
         </Box>
 
-        {/* Orta - Tab butonları */}
+        {/* Center - Tab buttons */}
         <Box
           sx={{
             display: 'flex',
@@ -200,7 +200,7 @@ function Header({ darkMode, onThemeChange, activeTab, onTabChange, onHomeClick, 
           ))}
         </Box>
 
-        {/* Sağ taraf - Theme toggle */}
+        {/* Right side - Theme toggle */}
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
           <Box
             sx={{

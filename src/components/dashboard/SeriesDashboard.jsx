@@ -56,7 +56,7 @@ function SeriesDashboard() {
       }}
     >
       <Box sx={{ py: 4 }}>
-        {/* Modern başlık */}
+        {/* Modern header */}
         <Box
           sx={{
             textAlign: 'center',
@@ -109,7 +109,7 @@ function SeriesDashboard() {
 
         <Grid container spacing={4} justifyContent="center" width="100%">
           <Grid item xs={12}>
-            {/* Üstte grafikler ve istatistik kartları yan yana */}
+            {/* Charts and statistics cards side by side */}
             <Box sx={{
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
@@ -117,9 +117,9 @@ function SeriesDashboard() {
               mb: 4,
               alignItems: 'stretch',
               justifyContent: 'center',
-              width: '100%' // kutu tam ekranı kaplasın
+              width: '100%' // box fills the screen
             }}>
-              {/* Grafikler */}
+              {/* Charts */}
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
                 <Box sx={{
                   background: (theme) => theme.palette.mode === 'dark'
@@ -140,7 +140,7 @@ function SeriesDashboard() {
                 }}>
                   <UniversalChart 
                     data={movies} 
-                    title="🎭 Tür Dağılımı"
+                    title="🎭 Genre Distribution"
                     type="doughnut"
                     dataKey="genre"
                     height={220}
@@ -166,7 +166,7 @@ function SeriesDashboard() {
                 }}>
                   <UniversalChart 
                     data={movies} 
-                    title="📈 İzleme Durumu"
+                    title="📈 Watching Status"
                     type="pie"
                     dataKey="status"
                     labelTransform={(status) => {
@@ -178,7 +178,7 @@ function SeriesDashboard() {
                   />
                 </Box>
               </Box>
-              {/* İstatistik kartları 2x2 grid */}
+              {/* Statistics cards 2x2 grid */}
               <Box
                 sx={{
                   display: 'grid',
@@ -191,10 +191,10 @@ function SeriesDashboard() {
                   ml: { xs: 0, md: 4 }
                 }}
               >
-                {[ // kartlar eşit boyutlu
+                {[ // cards equal size
                   {
                     value: movies.length,
-                    label: 'Toplam Film/Dizi',
+                    label: 'Total Movies/Series',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)'
                       : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -202,7 +202,7 @@ function SeriesDashboard() {
                   },
                   {
                     value: movies.filter(m => m.status === 'completed').length,
-                    label: 'İzlenen',
+                    label: 'Watched',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                       : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
@@ -210,7 +210,7 @@ function SeriesDashboard() {
                   },
                   {
                     value: movies.filter(m => m.status === 'watching').length,
-                    label: 'İzliyor',
+                    label: 'Watching',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
                       : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
@@ -221,7 +221,7 @@ function SeriesDashboard() {
                       ? (movies.filter(m => m.rating > 0).reduce((sum, m) => sum + m.rating, 0) /
                         movies.filter(m => m.rating > 0).length).toFixed(1)
                       : '0',
-                    label: 'Ortalama Puan',
+                    label: 'Avg. Rating',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
                       : 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
@@ -245,7 +245,7 @@ function SeriesDashboard() {
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Typography variant="h5" data-testid={card.label === 'Ortalama Puan' ? 'average-rating-value' : undefined} sx={{ fontWeight: 800, mb: 0.5, fontSize: '1.3rem', color: card.color }}>
+                    <Typography variant="h5" data-testid={card.label === 'Avg. Rating' ? 'average-rating-value' : undefined} sx={{ fontWeight: 800, mb: 0.5, fontSize: '1.3rem', color: card.color }}>
                       {card.value}
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.95rem', color: card.color }}>
@@ -256,10 +256,10 @@ function SeriesDashboard() {
               </Box>
             </Box>
           </Grid>
-          {/* ProjectCard'lar bilgi kartlarıyla aynı satırda olmasın, ama yan yana dizilsin */}
+          {/* Project cards should not be on the same row as info cards, but displayed side by side */}
           <Grid item xs={12} sx={{ width: '100%' }}>
             {movies.length === 0 ? (
-              // Hiç film/dizi yoksa gösterilecek boş durum
+              // Empty state when no movies/series exist
               <Box sx={{ 
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', 
                 minHeight: '500px', textAlign: 'center',
@@ -291,7 +291,7 @@ function SeriesDashboard() {
                     }
                   }}
                 >
-                  Yeni Film/Dizi Ekle
+                  Add New Movie/Series
                 </Button>
               </Box>
             ) : (
@@ -360,7 +360,7 @@ function SeriesDashboard() {
           <AddIcon fontSize="large" />
         </Fab>
 
-        {/* CSS animasyonu için global style */}
+        {/* Global style for CSS animation */}
         <style>
           {`
             @keyframes rotate {

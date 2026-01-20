@@ -56,7 +56,7 @@ function BookDashboard() {
       }}
     >
       <Box sx={{ py: 4 }}>
-        {/* Modern başlık */}
+        {/* Modern header */}
         <Box
           sx={{
             textAlign: 'center',
@@ -91,14 +91,14 @@ function BookDashboard() {
               📚 {DASHBOARD_TITLES.BOOKS}
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 300 }}>
-              Kitap koleksiyonunuzu yönetin ve keşfedin
+              Manage and explore your book collection
             </Typography>
           </Box>
         </Box>
 
         <Grid container spacing={4} justifyContent="center" width="100%">
           <Grid item xs={12}>
-            {/* Üstte grafikler ve istatistik kartları yan yana */}
+            {/* Charts and statistics cards side by side */}
             <Box sx={{
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
@@ -108,7 +108,7 @@ function BookDashboard() {
               justifyContent: 'center',
               width: '100%'
             }}>
-              {/* Grafikler */}
+              {/* Charts */}
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
                 <Box sx={{
                   background: (theme) => theme.palette.mode === 'dark'
@@ -129,7 +129,7 @@ function BookDashboard() {
                 }}>
                   <UniversalChart 
                     data={books} 
-                    title="📖 Tür Dağılımı"
+                    title="📖 Genre Distribution"
                     type="doughnut"
                     dataKey="genre"
                     height={220}
@@ -155,7 +155,7 @@ function BookDashboard() {
                 }}>
                   <UniversalChart 
                     data={books} 
-                    title="📊 Okuma Durumu"
+                    title="📊 Reading Status"
                     type="pie"
                     dataKey="status"
                     labelTransform={(status) => {
@@ -167,7 +167,7 @@ function BookDashboard() {
                   />
                 </Box>
               </Box>
-              {/* İstatistik kartları 2x2 grid */}
+              {/* Statistics cards 2x2 grid */}
               <Box
                 sx={{
                   display: 'grid',
@@ -180,10 +180,10 @@ function BookDashboard() {
                   ml: { xs: 0, md: 4 }
                 }}
               >
-                {[ // kartlar eşit boyutlu
+                {[ // cards equal size
                   {
                     value: books.length,
-                    label: 'Toplam Kitap',
+                    label: 'Total Books',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)'
                       : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
@@ -191,7 +191,7 @@ function BookDashboard() {
                   },
                   {
                     value: books.filter(b => b.status === 'completed').length,
-                    label: 'Okunan',
+                    label: 'Completed',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                       : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
@@ -199,7 +199,7 @@ function BookDashboard() {
                   },
                   {
                     value: books.filter(b => b.status === 'reading').length,
-                    label: 'Okunuyor',
+                    label: 'Reading',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
                       : 'linear-gradient(135deg, #66bb6a 0%, #43e97b 100%)',
@@ -210,7 +210,7 @@ function BookDashboard() {
                       ? (books.filter(b => b.rating > 0).reduce((sum, b) => sum + b.rating, 0) /
                         books.filter(b => b.rating > 0).length).toFixed(1)
                       : '0',
-                    label: 'Ortalama Puan',
+                    label: 'Avg. Rating',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
                       : 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
@@ -234,7 +234,7 @@ function BookDashboard() {
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Typography variant="h5" data-testid={card.label === 'Ortalama Puan' ? 'average-rating-value' : undefined} sx={{ fontWeight: 800, mb: 0.5, fontSize: '1.3rem', color: card.color }}>
+                    <Typography variant="h5" data-testid={card.label === 'Avg. Rating' ? 'average-rating-value' : undefined} sx={{ fontWeight: 800, mb: 0.5, fontSize: '1.3rem', color: card.color }}>
                       {card.value}
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.95rem', color: card.color }}>
@@ -245,7 +245,7 @@ function BookDashboard() {
               </Box>
             </Box>
           </Grid>
-          {/* ProjectCard'lar bilgi kartlarıyla aynı satırda olmasın, ama yan yana dizilsin */}
+          {/* Project cards should not be on the same row as info cards, but displayed side by side */}
           <Grid item xs={12} sx={{ width: '100%' }}>
             {books.length === 0 ? (
               <Box sx={{ 
@@ -284,7 +284,7 @@ function BookDashboard() {
                 container
                 spacing={2}
                 justifyContent="center"
-                sx={{ mt: 0 }} // bilgi kartlarıyla aynı satırda olmasın
+                sx={{ mt: 0 }} // should not be on the same row as info cards
               >
                 {books.map((project) => (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={project._id}>

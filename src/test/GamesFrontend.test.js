@@ -3,7 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProjectProvider, useProject } from '../context/ProjectContext.jsx';
 
-// MongoDB Helper - direkt veritabanı işlemleri için
+// MongoDB Helper - for direct database operations
 import { gamesDB, cleanupAllTestData, closeDB } from './helpers/mongoHelper.js';
 
 // Test run isolation id
@@ -12,33 +12,33 @@ const TEST_RUN_ID = `games-frontend-${Date.now()}-${Math.random().toString(36).s
 // Simple cleanup function for React tests
 const cleanupTestData = async () => {
   try {
-    // Sadece bu test çalıştırmasının verilerini temizle
+    // Only clean up data from this test run
     if (gamesDB.cleanupGamesByTestId) {
       await gamesDB.cleanupGamesByTestId(TEST_RUN_ID);
     } else {
       await gamesDB.cleanupTestGames();
     }
-    console.log('Test oyunları temizlendi (MongoDB direkt)');
+    console.log('Test games cleaned up (MongoDB direct)');
   } catch (error) {
-    console.log('Test oyun temizleme hatası:', error.message);
+    console.log('Test game cleanup error:', error.message);
   }
 };
 
-// Test verileri
+// Test data
 const testGames = [
   {
-    title: 'Test Oyun Context 1',
+    title: 'Test Game Context 1',
     genre: 'RPG',
-    status: 'Oynandı',
+    status: 'Played',
     rating: 4.5,
     platform: 'PC',
   image: 'test-game-1.jpg',
   testId: TEST_RUN_ID
   },
   {
-    title: 'Test Oyun Context 2',
+    title: 'Test Game Context 2',
     genre: 'Action',
-    status: 'Oynanacak',
+    status: 'To Play',
     rating: 0,
     platform: 'PlayStation',
   image: 'test-game-2.jpg',
@@ -46,7 +46,7 @@ const testGames = [
   }
 ];
 
-// Test bileşeni
+// Test component
 function TestComponent({ testData = null }) {
   const { 
     games, 
@@ -99,7 +99,7 @@ function TestComponent({ testData = null }) {
         if (projectToDelete && projectToDelete.testId === TEST_RUN_ID) {
           await deleteProject(projectToDelete._id, 'game');
         } else if (projectToDelete) {
-          console.warn('Gerçek veri silinmeye çalışıldı, işlem engellendi.');
+          console.warn('Attempted to delete real data, operation blocked.');
         }
       }
     } catch (error) {
@@ -126,26 +126,26 @@ function TestComponent({ testData = null }) {
 
 describe('ProjectContext Games Integration Tests', () => {
   beforeEach(async () => {
-    // Her testten önce test verilerini temizle (direkt MongoDB ile)
+    // Clean up test data before each test (direct MongoDB)
     await cleanupTestData();
   });
 
   afterAll(async () => {
-    // Test bitince test verilerini temizle
+    // Clean up test data after all tests
     await cleanupTestData();
   await closeDB();
   });
 
   describe('Context Provider', () => {
     test('should throw error when used outside provider', () => {
-      // Given - Context provider dışında bir bileşen
+      // Given - A component outside the context provider
       const TestWithoutProvider = () => {
         useProject();
         return <div>Test</div>;
       };
 
-      // When - Bileşeni render et
-      // Then - Hata fırlatılmalı
+      // When - Render the component
+      // Then - Error should be thrown
       expect(() => {
         render(<TestWithoutProvider />);
       }).toThrow('useProject must be used within a ProjectProvider');
@@ -154,24 +154,24 @@ describe('ProjectContext Games Integration Tests', () => {
 
   describe('Initial Data Fetching', () => {
     test('should load games on mount', async () => {
-      // Given - Test verilerini direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add test data directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
 
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbGame = await gamesDB.findGameById(savedGame._id.toString());
       expect(dbGame.title).toBe(testGames[0].title);
 
-      // When - Bileşeni render et
+      // When - Render the component
       render(
         <ProjectProvider>
           <TestComponent />
         </ProjectProvider>
       );
 
-      // Then - Oyunlar yüklenmiş olmalı
+      // Then - Games should be loaded
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
-    // Sadece bu test run'a ait verileri sayıyoruz (tam olarak 1 olmalı)
+    // Only counting data from this test run (should be exactly 1)
     expect(parseInt(screen.getByTestId('games-count').textContent)).toBe(1);
       });
     });
@@ -179,7 +179,7 @@ describe('ProjectContext Games Integration Tests', () => {
 
   describe('Add Game Project', () => {
     test('should add a new game project successfully', async () => {
-      // Given - Başlangıçta oyun sayısını al
+      // Given - Get initial game count
       render(
         <ProjectProvider>
           <TestComponent />
@@ -191,12 +191,12 @@ describe('ProjectContext Games Integration Tests', () => {
       });
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Oyun ekle butonuna tıkla
+      // When - Click add game button
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Oyun sayısı artmalı
+      // Then - Game count should increase
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -205,11 +205,11 @@ describe('ProjectContext Games Integration Tests', () => {
     });
 
     test('should prevent duplicate game addition', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add existing game directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       window.alert = jest.fn();
 
-      // When - Aynı oyun tekrar eklenmeye çalışılır
+      // When - Try to add the same game again
       render(
         <ProjectProvider>
           <TestComponent testData={testGames[0]} />
@@ -217,18 +217,18 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
           expect(parseInt(screen.getByTestId('games-count').textContent)).toBe(1);
       });
 
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Ekle butonuna tıkla
+      // When - Click add button
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Duplicate uyarısı gösterilmeli ve sayı artmamalı
+      // Then - Duplicate warning should be shown and count should not increase
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -238,11 +238,11 @@ describe('ProjectContext Games Integration Tests', () => {
     });
 
     test('should handle add game with invalid data - empty title', async () => {
-      // Given - Geçersiz veri (boş title)
-      const invalidData = { title: '', genre: 'RPG', status: 'Oynandı', platform: 'PC' };
+      // Given - Invalid data (empty title)
+      const invalidData = { title: '', genre: 'RPG', status: 'Played', platform: 'PC' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni geçersiz veriyle render et
+      // When - Render component with invalid data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidData} />
@@ -255,12 +255,12 @@ describe('ProjectContext Games Integration Tests', () => {
 
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Ekle butonuna tıkla
+      // When - Click add button
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Oyun eklenmemeli ve hata loglanmalı
+      // Then - Game should not be added and error should be logged
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -274,11 +274,11 @@ describe('ProjectContext Games Integration Tests', () => {
     });
 
     test('should handle add game with missing genre', async () => {
-      // Given - Geçersiz veri (boş genre)
-      const invalidData = { title: 'Test Title', genre: '', status: 'Oynandı', platform: 'PC' };
+      // Given - Invalid data (empty genre)
+      const invalidData = { title: 'Test Title', genre: '', status: 'Played', platform: 'PC' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni geçersiz veriyle render et
+      // When - Render component with invalid data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidData} />
@@ -291,12 +291,12 @@ describe('ProjectContext Games Integration Tests', () => {
 
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Ekle butonuna tıkla
+      // When - Click add button
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Oyun eklenmemeli ve hata loglanmalı
+      // Then - Game should not be added and error should be logged
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -310,11 +310,11 @@ describe('ProjectContext Games Integration Tests', () => {
     });
 
     test('should handle add game with missing status', async () => {
-      // Given - Geçersiz veri (boş status)
+      // Given - Invalid data (empty status)
       const invalidData = { title: 'Test Title', genre: 'RPG', status: '', platform: 'PC' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni geçersiz veriyle render et
+      // When - Render component with invalid data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidData} />
@@ -327,12 +327,12 @@ describe('ProjectContext Games Integration Tests', () => {
 
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Ekle butonuna tıkla
+      // When - Click add button
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Oyun eklenmemeli ve hata loglanmalı
+      // Then - Game should not be added and error should be logged
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -348,11 +348,11 @@ describe('ProjectContext Games Integration Tests', () => {
 
   describe('Update Game Project', () => {
     test('should update existing game successfully', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add existing game directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
 
-      // When - Güncelleme işlemi için bileşeni render et
+      // When - Render component for update operation
       render(
         <ProjectProvider>
           <TestComponent />
@@ -360,17 +360,17 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
     expect(parseInt(screen.getByTestId('games-count').textContent)).toBe(1);
         expect(screen.getByTestId(`project-${gameId}`)).toHaveTextContent(testGames[0].title);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Oyun güncellenmiş olmalı
+      // Then - Game should be updated
       await waitFor(() => {
         expect(screen.getByTestId(`project-${gameId}`)).toHaveTextContent('Updated Project');
       });
@@ -378,13 +378,13 @@ describe('ProjectContext Games Integration Tests', () => {
 
 
     test('should handle update with invalid data - empty title', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle ve geçersiz güncelleme verisi
+      // Given - Add existing game directly with MongoDB and invalid update data
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
       const invalidUpdateData = { title: '', genre: 'Updated Genre', status: 'Updated Status', platform: 'Updated Platform' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni geçersiz güncelleme verisiyle render et
+      // When - Render component with invalid update data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidUpdateData} />
@@ -392,16 +392,16 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
         expect(parseInt(screen.getByTestId('games-count').textContent)).toBeGreaterThanOrEqual(1);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Hata loglanmalı ve oyun güncellenmemeli
+      // Then - Error should be logged and game should not be updated
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error updating game:',
@@ -414,13 +414,13 @@ describe('ProjectContext Games Integration Tests', () => {
     });
 
     test('should handle update with invalid data - empty genre', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle ve geçersiz güncelleme verisi
+      // Given - Add existing game directly with MongoDB and invalid update data
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
       const invalidUpdateData = { title: 'Updated Title', genre: '', status: 'Updated Status', platform: 'Updated Platform' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni geçersiz güncelleme verisiyle render et
+      // When - Render component with invalid update data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidUpdateData} />
@@ -428,16 +428,16 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
         expect(parseInt(screen.getByTestId('games-count').textContent)).toBeGreaterThanOrEqual(1);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Hata loglanmalı ve oyun güncellenmemeli
+      // Then - Error should be logged and game should not be updated
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error updating game:',
@@ -450,13 +450,13 @@ describe('ProjectContext Games Integration Tests', () => {
     });
 
     test('should handle update with invalid data - empty status', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle ve geçersiz güncelleme verisi
+      // Given - Add existing game directly with MongoDB and invalid update data
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
       const invalidUpdateData = { title: 'Updated Title', genre: 'Updated Genre', status: '', platform: 'Updated Platform' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni geçersiz güncelleme verisiyle render et
+      // When - Render component with invalid update data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidUpdateData} />
@@ -464,16 +464,16 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
         expect(parseInt(screen.getByTestId('games-count').textContent)).toBeGreaterThanOrEqual(1);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Hata loglanmalı ve oyun güncellenmemeli
+      // Then - Error should be logged and game should not be updated
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error updating game:',
@@ -489,11 +489,11 @@ describe('ProjectContext Games Integration Tests', () => {
 
   describe('Delete Game Project', () => {
     test('should delete existing game successfully', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add existing game directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
 
-      // When - Silme işlemi için bileşeni render et
+      // When - Render component for delete operation
       render(
         <ProjectProvider>
           <TestComponent />
@@ -501,39 +501,39 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceği için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
         expect(parseInt(screen.getByTestId('games-count').textContent)).toBeGreaterThanOrEqual(1);
         expect(screen.getByTestId(`project-${gameId}`)).toHaveTextContent(testGames[0].title);
       });
 
-      // When - Silme işlemi öncesi test oyunlarının sayısını al
+      // When - Get game count before delete operation
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Sil butonuna tıkla
+      // When - Click delete button
       await act(async () => {
         screen.getByTestId('delete-project').click();
       });
 
-      // Then - Silinen oyunun DOM'dan kaybolmasını bekle
+      // Then - Wait for deleted game to disappear from DOM
       await waitFor(() => {
         expect(screen.queryByTestId(`project-${gameId}`)).not.toBeInTheDocument();
       });
 
-      // Then - Oyun sayısı azalmış olmalı
+      // Then - Game count should decrease
       const finalCount = parseInt(screen.getByTestId('games-count').textContent);
       expect(finalCount).toBeLessThan(initialCount);
     });
 
     test('should handle delete game error - non-existent game', async () => {
-      // Given - Mevcut oyunu direkt MongoDB ile ekle sonra sil
+      // Given - Add existing game directly with MongoDB then delete
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      // When - Bileşeni render et
+      // When - Render component
       render(
         <ProjectProvider>
           <TestComponent />
@@ -541,52 +541,52 @@ describe('ProjectContext Games Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
         expect(parseInt(screen.getByTestId('games-count').textContent)).toBeGreaterThanOrEqual(1);
       });
 
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Oyunu önceden direkt MongoDB ile sil ki hata alsın
+      // When - Delete game directly with MongoDB first to cause error
       await gamesDB.deleteGame(gameId);
 
-      // When - Sil butonuna tıkla
+      // When - Click delete button
       await act(async () => {
         screen.getByTestId('delete-project').click();
       });
 
-      // Then - Oyun sayısı değişmemeli
+      // Then - Game count should not change
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
       const finalCount = parseInt(screen.getByTestId('games-count').textContent);
       expect(finalCount).toBe(initialCount);
 
-      // İstersen consoleErrorSpy ile çağrı olup olmadığını kontrol etmeden de bırakabilirsin
-      // Eğer context'te console.error çağrısı garanti edilmiyorsa bu assertion'ı kaldırmak en doğrusudur.
+      // You can leave this without checking consoleErrorSpy call
+      // If console.error call is not guaranteed in context, it's best to remove this assertion.
       consoleErrorSpy.mockRestore();
     });
 
     test('should handle delete with no games available', async () => {
-      // Given - Boş liste (gerçek DB'de başka veriler olabilir ama test verileri yok)
+      // Given - Empty list (real DB may have other data but no test data)
       render(
         <ProjectProvider>
           <TestComponent />
         </ProjectProvider>
       );
 
-      // When - Sayfa yüklenmesini bekle ve initialCount'u al
+      // When - Wait for page load and get initialCount
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
       const initialCount = parseInt(screen.getByTestId('games-count').textContent);
 
-      // When - Test verileri yoksa silme işlemi hata vermemeli, sil butonuna tıkla
+      // When - If no test data, delete operation should not error, click delete button
       await act(async () => {
         screen.getByTestId('delete-project').click();
       });
 
-      // Then - Tekrar yüklenmesini bekle ve son count'u al
+      // Then - Wait for reload and get final count
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });

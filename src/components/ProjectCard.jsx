@@ -7,8 +7,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useProject } from '../context/ProjectContext';
 import { DELETE_DIALOG, IMAGE_UPLOAD, UI_TEXT } from '../config/constants';
 
-// data: gösterilecek veriler (ör: project)
-// fields: [{ key: 'title', label: 'Başlık' }, ...]
+// data: data to display (e.g., project)
+// fields: [{ key: 'title', label: 'Title' }, ...]
 // statusOptions: [{ value, label }]
 function ProjectCard({ data, fields, statusOptions = [], deleteDialogConfig = {}, onEdit }) {
   const { deleteProject } = useProject();
@@ -216,7 +216,7 @@ function ProjectCard({ data, fields, statusOptions = [], deleteDialogConfig = {}
       );
     }
     
-    // MiniCard'daki gibi küçük ikon göster
+    // Show small icon like MiniCard
     let icon = "📷";
     if (data.type === "series") icon = "🎬";
     else if (data.type === "game") icon = "🎮";
@@ -334,7 +334,7 @@ function ProjectCard({ data, fields, statusOptions = [], deleteDialogConfig = {}
             size="medium"
             color="primary" 
             onClick={() => onEdit(data)} 
-            aria-label="Düzenle"
+            aria-label="Edit"
             sx={{
               backgroundColor: (theme) => theme.palette.mode === 'dark'
                 ? 'rgba(139, 92, 246, 0.15)'
@@ -356,7 +356,7 @@ function ProjectCard({ data, fields, statusOptions = [], deleteDialogConfig = {}
             size="medium"
             color="error" 
             onClick={handleDelete} 
-            aria-label="Sil"
+            aria-label="Delete"
             sx={{
               backgroundColor: (theme) => theme.palette.mode === 'dark'
                 ? 'rgba(239, 68, 68, 0.15)'

@@ -1,24 +1,24 @@
 import axios from 'axios';
-// MongoDB Helper - direkt veritabanı işlemleri için
+// MongoDB Helper - for direct database operations
 const { gamesDB, closeDB } = require('./helpers/mongoHelper.js');
 
 // API URL
 const GAMES_API_URL = 'http://localhost:5000/api/games';
 
-// Test verileri
+// Test data
 const testGames = [
   {
-    title: 'Test Oyun 1',
+    title: 'Test Game 1',
     genre: 'RPG',
-    status: 'Oynandı',
+    status: 'Played',
     rating: 9.0,
     platform: 'PC',
     image: 'test-game-1.jpg'
   },
   {
-    title: 'Test Oyun 2',
+    title: 'Test Game 2',
     genre: 'Action',
-    status: 'Oynanacak',
+    status: 'To Play',
     rating: 0,
     platform: 'PS5',
     image: 'test-game-2.jpg'
@@ -27,25 +27,25 @@ const testGames = [
 
 describe('Games API Integration Tests', () => {
   beforeEach(async () => {
-    // Her testten önce test verilerini temizle (direkt MongoDB ile)
+    // Clean up test data before each test (direct MongoDB)
     await gamesDB.cleanupTestGames();
   });
 
   afterAll(async () => {
-    // Test bitince test verilerini temizle ve DB bağlantısını kapat
+    // Clean up test data after all tests and close DB connection
   await gamesDB.cleanupTestGames();
   await closeDB();
   });
 
   describe('Games API - POST /api/games', () => {
     test('should create a new game with valid data', async () => {
-      // Given - Geçerli test oyunu verisi
+      // Given - Valid test game data
       const gameData = testGames[0];
 
-      // When - Gerçek API'yi çağır
+      // When - Call the real API
       const response = await axios.post(GAMES_API_URL, gameData);
 
-      // Then - Gerçek response'u kontrol et
+      // Then - Check the real response
       expect(response).toMatchObject({
         status: 201,
         data: {
@@ -56,19 +56,19 @@ describe('Games API Integration Tests', () => {
       });
       expect(response.data).toHaveProperty('_id');
 
-      // Then - Oyunun gerçekten veritabanına eklendiğini mongoHelper ile kontrol et
+      // Then - Verify the game was actually added to the database using mongoHelper
       await expect(gamesDB.findGameById(response.data._id.toString())).resolves.toMatchObject({title: gameData.title});
     });
 
     test('should return 400 for game data without required fields', async () => {
-      // Given - Gerekli title alanı eksik oyun verisi
+      // Given - Game data without required title field
       const incompleteGame = {
         genre: 'RPG',
         platform: 'PC',
-        status: 'Oynandı'
+        status: 'Played'
       };
 
-      // When & Then - API çağrısı başarısız olmalı (title eksik)
+      // When & Then - API call should fail (title missing)
       await expect(axios.post(GAMES_API_URL, incompleteGame)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -80,14 +80,14 @@ describe('Games API Integration Tests', () => {
     });
 
     test('should return 400 for game data without genre', async () => {
-      // Given - genre alanı eksik oyun verisi
+      // Given - Game data without genre field
       const incompleteGame = {
-        title: 'Test Oyun',
+        title: 'Test Game',
         platform: 'PC',
-        status: 'Oynandı'
+        status: 'Played'
       };
 
-      // When & Then - API çağrısı başarısız olmalı (genre eksik)
+      // When & Then - API call should fail (genre missing)
       await expect(axios.post(GAMES_API_URL, incompleteGame)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -99,14 +99,14 @@ describe('Games API Integration Tests', () => {
     });
 
     test('should return 400 for game data without status', async () => {
-      // Given - status alanı eksik oyun verisi
+      // Given - Game data without status field
       const incompleteGame = {
-        title: 'Test Oyun',
+        title: 'Test Game',
         genre: 'RPG',
         platform: 'PC'
       };
 
-      // When & Then - API çağrısı başarısız olmalı (status eksik)
+      // When & Then - API call should fail (status missing)
       await expect(axios.post(GAMES_API_URL, incompleteGame)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -120,20 +120,20 @@ describe('Games API Integration Tests', () => {
 
   describe('Games API - GET /api/games', () => {
     test('should return all games', async () => {
-      // Given - Test verilerini direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add test data directly with MongoDB (without API)
       const savedGame1 = await gamesDB.insertGame(testGames[0]);
       const savedGame2 = await gamesDB.insertGame(testGames[1]);
 
-      // Given - Verilerin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbGame1 = await gamesDB.findGameById(savedGame1._id.toString());
       const dbGame2 = await gamesDB.findGameById(savedGame2._id.toString());
       expect(dbGame1.title).toBe(testGames[0].title);
       expect(dbGame2.title).toBe(testGames[1].title);
 
-      // When - Gerçek API'yi çağır
+      // When - Call the real API
       const response = await axios.get(GAMES_API_URL);
 
-      // Then - Test oyunlarının var olduğunu kontrol et
+      // Then - Verify test games exist
       expect(response.status).toBe(200);
       const testGameTitles = response.data.map(game => game.title);
       testGames.forEach(testGame => {
@@ -142,14 +142,14 @@ describe('Games API Integration Tests', () => {
     });
 
     test('should return games array even when no test games exist', async () => {
-      // When - API'yi çağır
+      // When - Call the API
       const response = await axios.get(GAMES_API_URL);
 
-      // Then - Array döndürülmeli (test dışı oyunlar da dahil olabilir)
+      // Then - Array should be returned (may include non-test games)
       expect(response.status).toBe(200);
       expect(Array.isArray(response.data)).toBe(true);
       
-      // Then - Test oyunlarının olmadığını kontrol et
+      // Then - Verify test games don't exist
       const gameTitles = response.data.map(game => game.title);
       expect(gameTitles).not.toContain(testGames[0].title);
       expect(gameTitles).not.toContain(testGames[1].title);
@@ -158,18 +158,18 @@ describe('Games API Integration Tests', () => {
 
   describe('Games API - GET /api/games/:id', () => {
     test('should return a single game by ID', async () => {
-      // Given - Veritabanına direkt MongoDB ile test oyunu ekle (API kullanmadan)
+      // Given - Add test game directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
       
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbGame = await gamesDB.findGameById(gameId);
       expect(dbGame.title).toBe(testGames[0].title);
       
-      // When - ID ile belirli oyunu getir
+      // When - Get specific game by ID
       const response = await axios.get(`${GAMES_API_URL}/${gameId}`);
 
-      // Then - Doğru oyun döndürülmeli
+      // Then - Correct game should be returned
       expect(response).toMatchObject({
         status: 200,
         data: {
@@ -181,44 +181,44 @@ describe('Games API Integration Tests', () => {
     });
 
     test('should return 404 for non-existent game ID', async () => {
-      // Given - Geçerli ama mevcut olmayan ObjectId
+      // Given - Valid but non-existent ObjectId
       const nonExistentId = '64a7b8c9d0e1f2a3b4c5d6e7';
 
-      // When & Then - API çağrısı 404 döndürmeli
+      // When & Then - API call should return 404
       await expect(axios.get(`${GAMES_API_URL}/${nonExistentId}`)).rejects.toMatchObject({response: {status: 404}});
     });
 
     test('should return 400 for invalid ID format', async () => {
-      // Given - Geçersiz ObjectId formatı
+      // Given - Invalid ObjectId format
       const invalidId = 'invalid-game-id';
 
-      // When & Then - API çağrısı 400 döndürmeli
+      // When & Then - API call should return 400
       await expect(axios.get(`${GAMES_API_URL}/${invalidId}`)).rejects.toMatchObject({response: {status: 400}});
     });
   });
 
   describe('Games API - PUT /api/games/:id', () => {
     test('should update an existing game', async () => {
-      // Given - Veritabanına direkt MongoDB ile test oyunu ekle (API kullanmadan)
+      // Given - Add test game directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
 
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbGame = await gamesDB.findGameById(gameId);
       expect(dbGame.title).toBe(testGames[0].title);
       expect(dbGame.genre).toBe(testGames[0].genre);
 
       const updateData = {
-        title: 'Güncellenmiş Oyun',
+        title: 'Updated Game',
         genre: 'Strategy',
-        status: 'Oynandı',
+        status: 'Played',
         rating: 8.5
       };
 
-      // When - Oyunu güncelle
+      // When - Update the game
       const response = await axios.put(`${GAMES_API_URL}/${gameId}`, updateData);
 
-      // Then - Güncellenmiş oyun döndürülmeli
+      // Then - Updated game should be returned
       expect(response).toMatchObject({
         status: 200,
         data: {
@@ -228,7 +228,7 @@ describe('Games API Integration Tests', () => {
         }
       });
 
-      // Then - Güncellemenin kalıcı olduğunu mongoHelper ile doğrula
+      // Then - Verify update is persistent using mongoHelper
       const dbGameAfterUpdate = await gamesDB.findGameById(gameId);
       expect(dbGameAfterUpdate).toMatchObject({
         title: updateData.title,
@@ -237,26 +237,26 @@ describe('Games API Integration Tests', () => {
     });
 
     test('should return 404 for non-existent game ID', async () => {
-      // Given - Geçerli ama mevcut olmayan ObjectId ve güncelleme verisi
+      // Given - Valid but non-existent ObjectId and update data
       const nonExistentId = '64a7b8c9d0e1f2a3b4c5d6e7';
-      const updateData = { title: 'Updated Game', genre: 'Strategy', status: 'Oynandı' };
+      const updateData = { title: 'Updated Game', genre: 'Strategy', status: 'Played' };
 
-      // When & Then - API çağrısı 404 döndürmeli
+      // When & Then - API call should return 404
       await expect(axios.put(`${GAMES_API_URL}/${nonExistentId}`, updateData)).rejects.toMatchObject({response: {status: 404}});
     });
 
     test('should return 400 for invalid update data', async () => {
-      // Given - Direkt MongoDB ile geçerli oyun ekle ve geçersiz güncelleme verisi (API kullanmadan)
+      // Given - Add valid game directly with MongoDB and invalid update data (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
       
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbGame = await gamesDB.findGameById(gameId);
       expect(dbGame.title).toBe(testGames[0].title);
       
-      const invalidUpdateData = { title: '', genre: 'RPG', status: 'Oynandı' }; // Boş title
+      const invalidUpdateData = { title: '', genre: 'RPG', status: 'Played' }; // Empty title
 
-      // When & Then - API çağrısı 400 döndürmeli ve spesifik hata mesajı
+      // When & Then - API call should return 400 with specific error message
       await expect(axios.put(`${GAMES_API_URL}/${gameId}`, invalidUpdateData)).rejects.toMatchObject({
         response: {
           status: 400,
@@ -270,18 +270,18 @@ describe('Games API Integration Tests', () => {
 
   describe('Games API - DELETE /api/games/:id', () => {
     test('should delete an existing game', async () => {
-      // Given - Veritabanına direkt MongoDB ile test oyunu ekle (API kullanmadan)
+      // Given - Add test game directly with MongoDB (without API)
       const savedGame = await gamesDB.insertGame(testGames[0]);
       const gameId = savedGame._id.toString();
 
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbGame = await gamesDB.findGameById(gameId);
       expect(dbGame.title).toBe(testGames[0].title);
 
-      // When - Oyunu sil
+      // When - Delete the game
       const response = await axios.delete(`${GAMES_API_URL}/${gameId}`);
 
-      // Then - Başarılı silme response'u
+      // Then - Successful delete response
       expect(response).toMatchObject({
         status: 200,
         data: {
@@ -289,24 +289,24 @@ describe('Games API Integration Tests', () => {
         }
       });
 
-      // Then - Oyunun silindiğini mongoHelper ile doğrula
+      // Then - Verify game was deleted using mongoHelper
       const deletedGame = await gamesDB.findGameById(gameId);
       expect(deletedGame).toBeNull();
     });
 
     test('should return 404 for non-existent game ID', async () => {
-      // Given - Geçerli ama mevcut olmayan ObjectId
+      // Given - Valid but non-existent ObjectId
       const nonExistentId = '64a7b8c9d0e1f2a3b4c5d6e7';
 
-      // When & Then - API çağrısı 404 döndürmeli
+      // When & Then - API call should return 404
       await expect(axios.delete(`${GAMES_API_URL}/${nonExistentId}`)).rejects.toMatchObject({response: {status: 404}});
     });
 
     test('should return 400 for invalid game ID format', async () => {
-      // Given - Geçersiz ObjectId formatı
+      // Given - Invalid ObjectId format
       const invalidId = 'invalid-game-id-format';
 
-      // When & Then - API çağrısı 400 döndürmeli
+      // When & Then - API call should return 400
       await expect(axios.delete(`${GAMES_API_URL}/${invalidId}`)).rejects.toMatchObject({
         response: {
           status: 400

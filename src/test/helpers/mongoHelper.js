@@ -7,30 +7,30 @@ const DB_NAME = 'fullstack-app';
 let client;
 let db;
 
-// MongoDB bağlantısı kur
+// Establish MongoDB connection
 const connectDB = async () => {
   if (!client) {
     client = new MongoClient(MONGODB_URL);
     await client.connect();
     db = client.db(DB_NAME);
-    console.log('MongoDB bağlantısı kuruldu (test helper)');
+    console.log('MongoDB connection established (test helper)');
   }
   return db;
 };
 
-// MongoDB bağlantısını kapat
+// Close MongoDB connection
 const closeDB = async () => {
   if (client) {
     await client.close();
     client = null;
     db = null;
-    console.log('MongoDB bağlantısı kapatıldı (test helper)');
+    console.log('MongoDB connection closed (test helper)');
   }
 };
 
 // Books Collection CRUD Operations
 const booksDB = {
-  // Kitap ekle (validation olmadan direkt DB'ye)
+  // Add book (directly to DB without validation)
   async insertBook(bookData) {
     const database = await connectDB();
     const book = {
@@ -43,7 +43,7 @@ const booksDB = {
     return savedBook;
   },
 
-  // Kitap bul (ID ile)
+  // Find book (by ID)
   async findBookById(id) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -52,13 +52,13 @@ const booksDB = {
     return await database.collection('books').findOne({ _id: new ObjectId(id) });
   },
 
-  // Tüm kitapları getir
+  // Get all books
   async findAllBooks() {
     const database = await connectDB();
     return await database.collection('books').find({}).sort({ createdAt: -1 }).toArray();
   },
 
-  // Kitap güncelle
+  // Update book
   async updateBook(id, updateData) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -79,7 +79,7 @@ const booksDB = {
     return await database.collection('books').findOne({ _id: new ObjectId(id) });
   },
 
-  // Kitap sil
+  // Delete book
   async deleteBook(id) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -92,19 +92,19 @@ const booksDB = {
     return { message: 'Book deleted successfully' };
   },
 
-  // Test kitaplarını temizle
+  // Clean up test books
   async cleanupTestBooks() {
     const database = await connectDB();
     const testTitles = [
-      'Test Kitap 1',
-      'Test Kitap 2',
-      'Test Kitap Context 1',
-      'Test Kitap Context 2',
-      'Güncellenmiş Kitap',
+      'Test Book 1',
+      'Test Book 2',
+      'Test Book Context 1',
+      'Test Book Context 2',
+      'Updated Book',
       'Updated Project',
-      'Ortak İsim Test',
+      'Common Name Test',
       'Cross API Test',
-      'Aynı İsim'
+      'Same Name'
     ];
     
     await database.collection('books').deleteMany({
@@ -125,7 +125,7 @@ const booksDB = {
 
 // Games Collection CRUD Operations
 const gamesDB = {
-  // Oyun ekle (validation olmadan direkt DB'ye)
+  // Add game (directly to DB without validation)
   async insertGame(gameData) {
     const database = await connectDB();
     const game = {
@@ -138,7 +138,7 @@ const gamesDB = {
     return savedGame;
   },
 
-  // Oyun bul (ID ile)
+  // Find game (by ID)
   async findGameById(id) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -147,13 +147,13 @@ const gamesDB = {
     return await database.collection('games').findOne({ _id: new ObjectId(id) });
   },
 
-  // Tüm oyunları getir
+  // Get all games
   async findAllGames() {
     const database = await connectDB();
     return await database.collection('games').find({}).sort({ createdAt: -1 }).toArray();
   },
 
-  // Oyun güncelle
+  // Update game
   async updateGame(id, updateData) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -174,7 +174,7 @@ const gamesDB = {
     return await database.collection('games').findOne({ _id: new ObjectId(id) });
   },
 
-  // Oyun sil
+  // Delete game
   async deleteGame(id) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -187,16 +187,16 @@ const gamesDB = {
     return { message: 'Game deleted successfully' };
   },
 
-  // Test oyunlarını temizle
+  // Clean up test games
   async cleanupTestGames() {
     const database = await connectDB();
     const testTitles = [
-      'Test Oyun 1',
-      'Test Oyun 2',
-      'Test Oyun',
-      'Test Oyun Context 1',
-      'Test Oyun Context 2',
-      'Güncellenmiş Oyun',
+      'Test Game 1',
+      'Test Game 2',
+      'Test Game',
+      'Test Game Context 1',
+      'Test Game Context 2',
+      'Updated Game',
       'Updated Game',
       'Updated Project'
     ];
@@ -218,7 +218,7 @@ const gamesDB = {
 
 // Movies Collection CRUD Operations
 const moviesDB = {
-  // Film ekle (validation olmadan direkt DB'ye)
+  // Add movie (directly to DB without validation)
   async insertMovie(movieData) {
     const database = await connectDB();
     const movie = {
@@ -231,7 +231,7 @@ const moviesDB = {
     return savedMovie;
   },
 
-  // Film bul (ID ile)
+  // Find movie (by ID)
   async findMovieById(id) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -240,13 +240,13 @@ const moviesDB = {
     return await database.collection('movies').findOne({ _id: new ObjectId(id) });
   },
 
-  // Tüm filmleri getir
+  // Get all movies
   async findAllMovies() {
     const database = await connectDB();
     return await database.collection('movies').find({}).sort({ createdAt: -1 }).toArray();
   },
 
-  // Film güncelle
+  // Update movie
   async updateMovie(id, updateData) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -267,7 +267,7 @@ const moviesDB = {
     return await database.collection('movies').findOne({ _id: new ObjectId(id) });
   },
 
-  // Film sil
+  // Delete movie
   async deleteMovie(id) {
     const database = await connectDB();
     if (!ObjectId.isValid(id)) {
@@ -280,16 +280,16 @@ const moviesDB = {
     return { message: 'Movie deleted successfully' };
   },
 
-  // Test filmlerini temizle
+  // Clean up test movies
   async cleanupTestMovies() {
     const database = await connectDB();
     const testTitles = [
-      'Test Film 1',
-      'Test Film 2', 
-      'Test Film',
-      'Test Film Context 1',
-      'Test Film Context 2',
-      'Güncellenmiş Film',
+      'Test Movie 1',
+      'Test Movie 2', 
+      'Test Movie',
+      'Test Movie Context 1',
+      'Test Movie Context 2',
+      'Updated Movie',
       'Updated Movie',
       'Updated Project'
     ];
@@ -309,15 +309,15 @@ const moviesDB = {
   }
 };
 
-// Tüm test verilerini (sadece test amaçlı eklenenleri) temizle
+// Clean up all test data (only test-added data)
 const cleanupAllTestData = async () => {
   try {
     await booksDB.cleanupTestBooks();
     await gamesDB.cleanupTestGames();
     await moviesDB.cleanupTestMovies();
-    console.log('Sadece test verileri temizlendi (MongoDB direkt)');
+    console.log('Only test data cleaned up (MongoDB direct)');
   } catch (error) {
-    console.log('Test veri temizleme hatası:', error.message);
+    console.log('Test data cleanup error:', error.message);
   }
 };
 

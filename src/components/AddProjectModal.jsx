@@ -12,14 +12,14 @@ import { uploadAPI } from '../services/api';
 import { UI_TEXT, ERROR_MESSAGES, IMAGE_UPLOAD } from '../config/constants';
 
 /**
- * Birleşik proje ekleme modalı - film, oyun, kitap için kullanılır
+ * Unified project add modal - used for movies, games, books
  */
 function AddProjectModal({ 
   open, onClose, type, title, genreOptions, statusOptions, additionalFields = [] 
 }) {
   const { addProject, movies, games, books, isDuplicateTitle } = useProject();
   
-  // Form verilerini başlangıç değerleriyle başlat
+  // Initialize form data with default values
   const getInitialFormData = () => {
     const baseData = {
       title: '', genre: '', rating: 0, status: 'planned',
@@ -33,23 +33,23 @@ function AddProjectModal({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Form alanı değişikliklerini yönet
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Puan değişikliklerini yönet
+  // Handle rating changes
   const handleRatingChange = (event, newValue) => {
     setFormData(prev => ({ ...prev, rating: newValue }));
   };
 
-  // Tarih seçici değişikliklerini yönet
+  // Handle date picker changes
   const handleDateChange = (newValue) => {
     setFormData(prev => ({ ...prev, year: newValue }));
   };
 
-  // Resim yükleme işlemi
+  // Image upload handler
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -64,14 +64,14 @@ function AddProjectModal({
     try {
       const response = await uploadAPI.uploadImage(file);
       
-      // Resim yüklenmiş mi ve dosya boyutu 0'dan büyük mü kontrol et
+      // Check if image was uploaded and file size is greater than 0
       if (response?.data?.imageData && response?.data?.size > 0) {
         setFormData(prev => ({
           ...prev,
           image: response.data.imageData
         }));
       } else {
-        throw new Error('Resim yüklenemedi veya dosya boş');
+        throw new Error('Image upload failed or file is empty');
       }
     } catch (error) {
       console.error('File upload error:', error);
@@ -86,7 +86,7 @@ function AddProjectModal({
     }
   };
 
-  // Form gönderme işlemi
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -101,7 +101,7 @@ function AddProjectModal({
         'game': ERROR_MESSAGES.DUPLICATE_TITLE.GAME,
         'book': ERROR_MESSAGES.DUPLICATE_TITLE.BOOK
       };
-      alert(errorMap[type] || 'Bu isimde bir proje zaten var.');
+      alert(errorMap[type] || 'A project with this name already exists.');
       return;
     }
 
@@ -120,7 +120,7 @@ function AddProjectModal({
     }
   };
 
-  // Formu sıfırla
+  // Reset form
   const resetForm = () => setFormData(getInitialFormData());
 
   return (
@@ -128,7 +128,7 @@ function AddProjectModal({
       <Dialog 
         open={open} 
         onClose={onClose} 
-        maxWidth="xs" // daha küçük modal
+        maxWidth="xs" // smaller modal
         fullWidth
         PaperProps={{
           sx: {
@@ -144,10 +144,10 @@ function AddProjectModal({
         }}
       >
         <form onSubmit={handleSubmit}>
-          {/* Modal Başlığı */}
+          {/* Modal Title */}
           <DialogTitle sx={{ 
             textAlign: 'center',
-            fontSize: '1.3rem', // başlık küçültüldü
+            fontSize: '1.3rem', // title size reduced
             fontWeight: 600,
             py: 2,
             borderBottom: '1px solid',
@@ -159,7 +159,7 @@ function AddProjectModal({
           
           <DialogContent sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {/* Isim Alanı */}
+              {/* Title Field */}
               <TextField
                 name="title"
                 label={UI_TEXT.TITLE}
@@ -173,7 +173,7 @@ function AddProjectModal({
                 InputLabelProps={{ sx: { fontSize: '0.95rem' } }}
               />
 
-              {/* Tür */}
+              {/* Genre */}
               <FormControl fullWidth size="small">
                 <InputLabel sx={{ fontSize: '0.95rem' }}>{UI_TEXT.GENRE}</InputLabel>
                 <Select
@@ -190,7 +190,7 @@ function AddProjectModal({
                 </Select>
               </FormControl>
 
-              {/* Durum */}
+              {/* Status */}
               <FormControl fullWidth size="small">
                 <InputLabel sx={{ fontSize: '0.95rem' }}>{UI_TEXT.STATUS}</InputLabel>
                 <Select
@@ -206,7 +206,7 @@ function AddProjectModal({
                 </Select>
               </FormControl>
 
-              {/* Puan Değerlendirme */}
+              {/* Rating Section */}
               <Box sx={{ 
                 p: 1,
                 backgroundColor: (theme) => theme.palette.mode === 'dark' 
@@ -235,7 +235,7 @@ function AddProjectModal({
                 </Box>
               </Box>
 
-              {/* Ek Alanlar (Platform, Yönetmen, Yazar vs.) */}
+              {/* Additional Fields (Platform, Director, Author, etc.) */}
               {additionalFields.map(field => (
                 <TextField
                   key={field.key}
@@ -251,7 +251,7 @@ function AddProjectModal({
                 />
               ))}
 
-              {/* Yıl */}
+              {/* Year */}
               <DatePicker
                 label={UI_TEXT.YEAR}
                 views={['year']}
@@ -262,7 +262,7 @@ function AddProjectModal({
                 }}
               />
 
-              {/* Yorum */}
+              {/* Comment */}
               <TextField
                 name="comment"
                 label={UI_TEXT.COMMENT}
@@ -277,7 +277,7 @@ function AddProjectModal({
                 InputLabelProps={{ sx: { fontSize: '0.95rem' } }}
               />
 
-              {/* Resim Yükleme */}
+              {/* Image Upload */}
               <Box sx={{ 
                 p: 1.5,
                 border: '2px dashed',
@@ -325,7 +325,7 @@ function AddProjectModal({
             </Box>
           </DialogContent>
 
-          {/* Modal Alt Butonları */}
+          {/* Modal Footer Buttons */}
           <DialogActions sx={{ 
             p: 2, 
             borderTop: '1px solid',

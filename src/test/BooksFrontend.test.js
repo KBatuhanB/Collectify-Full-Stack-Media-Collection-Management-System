@@ -3,7 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProjectProvider, useProject } from '../context/ProjectContext.jsx';
 
-// MongoDB Helper - direkt veritabanı işlemleri için
+// MongoDB Helper - for direct database operations
 import { booksDB, closeDB } from './helpers/mongoHelper.js';
 
 // Test run isolation id to tag and filter documents
@@ -12,41 +12,41 @@ const TEST_RUN_ID = `books-frontend-${Date.now()}-${Math.random().toString(36).s
 // Simple cleanup function for React tests
 const cleanupTestData = async () => {
   try {
-    // Sadece bu test çalıştırmasında oluşturulan verileri temizle
+    // Only clean up data created in this test run
     if (booksDB.cleanupBooksByTestId) {
       await booksDB.cleanupBooksByTestId(TEST_RUN_ID);
     } else {
       await booksDB.cleanupTestBooks();
     }
-    console.log('Test kitapları temizlendi (MongoDB direkt)');
+    console.log('Test books cleaned up (MongoDB direct)');
   } catch (error) {
-    console.log('Test kitap temizleme hatası:', error.message);
+    console.log('Test book cleanup error:', error.message);
   }
 };
 
-// Test verileri
+// Test data
 const testBooks = [
   {
-    title: 'Test Kitap Context 1',
-    genre: 'Roman',
-    status: 'Okundu',
+    title: 'Test Book Context 1',
+    genre: 'Fiction',
+    status: 'Read',
     rating: 4.5,
-    author: 'Test Yazar 1',
+    author: 'Test Author 1',
     image: 'test-book-1.jpg',
     testId: TEST_RUN_ID
   },
   {
-    title: 'Test Kitap Context 2',
-    genre: 'Bilim Kurgu',
-    status: 'Okunacak',
+    title: 'Test Book Context 2',
+    genre: 'Sci-Fi',
+    status: 'To Read',
     rating: 0,
-    author: 'Test Yazar 2',
+    author: 'Test Author 2',
     image: 'test-book-2.jpg',
     testId: TEST_RUN_ID
   }
 ];
 
-// Test bileşeni
+// Test component
 function TestComponent({ testData = null }) {
   const {
     books,
@@ -101,7 +101,7 @@ function TestComponent({ testData = null }) {
         if (projectToDelete && projectToDelete.testId === TEST_RUN_ID) {
           await deleteProject(projectToDelete._id, 'book');
         } else if (projectToDelete) {
-          console.warn('Gerçek veri silinmeye çalışıldı, işlem engellendi.');
+          console.warn('Attempted to delete real data, operation blocked.');
         }
       }
     } catch (error) {
@@ -128,14 +128,14 @@ function TestComponent({ testData = null }) {
 
 describe('ProjectContext Books Integration Tests', () => {
   beforeEach(async () => {
-    // Her testten önce test verilerini temizle (direkt MongoDB ile)
+    // Clean up test data before each test (direct MongoDB)
     await cleanupTestData();
   });
 
   afterAll(async () => {
-    // Test bitince test verilerini temizle
+    // Clean up test data after all tests
     await cleanupTestData();
-    // Açık DB bağlantısını kapat
+    // Close open DB connection
     await closeDB();
   });
 
@@ -154,10 +154,10 @@ describe('ProjectContext Books Integration Tests', () => {
 
   describe('Initial Data Fetching', () => {
     test('should load books on mount', async () => {
-      // Given - Test verilerini direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add test data directly with MongoDB (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
 
-      // Given - Verinin gerçekten eklendiğini kontrol et
+      // Given - Verify data was actually added
       const dbBook = await booksDB.findBookById(savedBook._id.toString());
       expect(dbBook.title).toBe(testBooks[0].title);
 
@@ -169,7 +169,7 @@ describe('ProjectContext Books Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
-        // Sadece bu test run'a ait verileri sayıyoruz (tam olarak 1 olmalı)
+        // Only counting data from this test run (should be exactly 1)
         expect(parseInt(screen.getByTestId('books-count').textContent)).toBe(1);
       });
     });
@@ -177,7 +177,7 @@ describe('ProjectContext Books Integration Tests', () => {
 
   describe('Add Book Project', () => {
     test('should add a new book project successfully', async () => {
-      // Given - Başlangıçta kitap sayısını al
+      // Given - Get initial book count
       render(
         <ProjectProvider>
           <TestComponent />
@@ -190,12 +190,12 @@ describe('ProjectContext Books Integration Tests', () => {
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
       expect(initialCount).toBe(0);
 
-      // When - Kitap ekle butonuna tıkla
+      // When - Click add book button
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Kitap sayısı artmalı
+      // Then - Book count should increase
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -204,7 +204,7 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should prevent duplicate book addition', async () => {
-      // Given - Aynı başlıkta kitap zaten ekli
+      // Given - Book with same title already exists
       const savedBook = await booksDB.insertBook(testBooks[0]);
       window.alert = jest.fn();
 
@@ -219,12 +219,12 @@ describe('ProjectContext Books Integration Tests', () => {
       });
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
 
-      // When - Tekrar aynı kitap eklenmeye çalışılır
+      // When - Try to add the same book again
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Duplicate uyarısı gösterilmeli ve sayı değişmemeli
+      // Then - Duplicate warning should be shown and count should not change
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -234,8 +234,8 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle add book with invalid data - empty title', async () => {
-      // Given - Geçersiz veri (boş title)
-      const invalidData = { title: '', genre: 'Roman', status: 'Okundu', author: 'Test Yazar' };
+      // Given - Invalid data (empty title)
+      const invalidData = { title: '', genre: 'Fiction', status: 'Read', author: 'Test Author' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
       render(
@@ -250,12 +250,12 @@ describe('ProjectContext Books Integration Tests', () => {
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
       expect(initialCount).toBe(0);
 
-      // When - Boş başlıkla kitap eklenmeye çalışılır
+      // When - Try to add book with empty title
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Kitap eklenmemeli ve hata loglanmalı
+      // Then - Book should not be added and error should be logged
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -269,8 +269,8 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle add book with missing genre', async () => {
-      // Given - Geçersiz veri (boş genre)
-      const invalidData = { title: 'Test Title', genre: '', status: 'Okundu', author: 'Test Yazar' };
+      // Given - Invalid data (empty genre)
+      const invalidData = { title: 'Test Title', genre: '', status: 'Read', author: 'Test Author' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
       render(
@@ -285,12 +285,12 @@ describe('ProjectContext Books Integration Tests', () => {
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
       expect(initialCount).toBe(0);
 
-      // When - Boş genre ile kitap eklenmeye çalışılır
+      // When - Try to add book with empty genre
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Kitap eklenmemeli ve hata loglanmalı
+      // Then - Book should not be added and error should be logged
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -304,8 +304,8 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle add book with missing status', async () => {
-      // Given - Geçersiz veri (boş status)
-      const invalidData = { title: 'Test Title', genre: 'Roman', status: '', author: 'Test Yazar' };
+      // Given - Invalid data (empty status)
+      const invalidData = { title: 'Test Title', genre: 'Fiction', status: '', author: 'Test Author' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
       render(
@@ -320,12 +320,12 @@ describe('ProjectContext Books Integration Tests', () => {
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
       expect(initialCount).toBe(0);
 
-      // When - Boş status ile kitap eklenmeye çalışılır
+      // When - Try to add book with empty status
       await act(async () => {
         screen.getByTestId('add-project').click();
       });
 
-      // Then - Kitap eklenmemeli ve hata loglanmalı
+      // Then - Book should not be added and error should be logged
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -341,11 +341,11 @@ describe('ProjectContext Books Integration Tests', () => {
 
   describe('Update Book Project', () => {
     test('should update existing book successfully', async () => {
-      // Given - Mevcut kitabı direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add existing book directly with MongoDB (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
 
-      // When - Güncelleme işlemi için bileşeni render et
+      // When - Render component for update operation
       render(
         <ProjectProvider>
           <TestComponent />
@@ -353,17 +353,17 @@ describe('ProjectContext Books Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Gerçek DB'de mevcut veriler olabileceğı için en az 1 olduğunu kontrol et
+        // Check real DB may have existing data so at least 1
         expect(parseInt(screen.getByTestId('books-count').textContent)).toBe(1);
         expect(screen.getByTestId(`project-${bookId}`)).toHaveTextContent(testBooks[0].title);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Kitap güncellenmiş olmalı
+      // Then - Book should be updated
       await waitFor(() => {
         expect(screen.getByTestId(`project-${bookId}`)).toHaveTextContent('Updated Project');
       });
@@ -371,13 +371,13 @@ describe('ProjectContext Books Integration Tests', () => {
 
 
     test('should handle update with invalid data - empty title', async () => {
-      // Given - Mevcut kitabı direkt MongoDB ile ekle ve geçersiz güncelleme verisi
+      // Given - Add existing book directly with MongoDB and invalid update data
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
       const invalidUpdateData = { title: '', genre: 'Updated Genre', status: 'Updated Status', author: 'Updated Author' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
-      // When - Bileşeni geçersiz güncelleme verisiyle render et
+      // When - Render component with invalid update data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidUpdateData} />
@@ -385,16 +385,16 @@ describe('ProjectContext Books Integration Tests', () => {
       );
 
       await waitFor(() => {
-        // Sadece bu test run'ındaki veriler olduğundan tam 1 olmalı
+        // Only data from this test run so should be exactly 1
         expect(parseInt(screen.getByTestId('books-count').textContent)).toBe(1);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Hata loglanmalı ve kitap güncellenmemeli
+      // Then - Error should be logged and book should not be updated
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error updating book:',
@@ -407,13 +407,13 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle update with invalid data - empty genre', async () => {
-      // Given - Mevcut kitabı direkt MongoDB ile ekle ve geçersiz güncelleme verisi
+      // Given - Add existing book directly with MongoDB and invalid update data
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
       const invalidUpdateData = { title: 'Updated Title', genre: '', status: 'Updated Status', author: 'Updated Author' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
-      // When - Bileşeni geçersiz güncelleme verisiyle render et
+      // When - Render component with invalid update data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidUpdateData} />
@@ -424,12 +424,12 @@ describe('ProjectContext Books Integration Tests', () => {
         expect(parseInt(screen.getByTestId('books-count').textContent)).toBe(1);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Hata loglanmalı ve kitap güncellenmemeli
+      // Then - Error should be logged and book should not be updated
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error updating book:',
@@ -442,13 +442,13 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle update with invalid data - empty status', async () => {
-      // Given - Mevcut kitabı direkt MongoDB ile ekle ve geçersiz güncelleme verisi
+      // Given - Add existing book directly with MongoDB and invalid update data
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
       const invalidUpdateData = { title: 'Updated Title', genre: 'Updated Genre', status: '', author: 'Updated Author' };
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
-      // When - Bileşeni geçersiz güncelleme verisiyle render et
+      // When - Render component with invalid update data
       render(
         <ProjectProvider>
           <TestComponent testData={invalidUpdateData} />
@@ -459,12 +459,12 @@ describe('ProjectContext Books Integration Tests', () => {
         expect(parseInt(screen.getByTestId('books-count').textContent)).toBe(1);
       });
 
-      // When - Güncelle butonuna tıkla
+      // When - Click update button
       await act(async () => {
         screen.getByTestId('update-project').click();
       });
 
-      // Then - Hata loglanmalı ve kitap güncellenmemeli
+      // Then - Error should be logged and book should not be updated
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Error updating book:',
@@ -480,11 +480,11 @@ describe('ProjectContext Books Integration Tests', () => {
 
   describe('Delete Book Project', () => {
     test('should delete existing book successfully', async () => {
-      // Given - Mevcut kitabı direkt MongoDB ile ekle (API kullanmadan)
+      // Given - Add existing book directly with MongoDB (without API)
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
 
-      // When - Silme işlemi için bileşeni render et
+      // When - Render component for delete operation
       render(
         <ProjectProvider>
           <TestComponent />
@@ -501,12 +501,12 @@ describe('ProjectContext Books Integration Tests', () => {
       });
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
 
-      // When - Sil butonuna tıkla
+      // When - Click delete button
       await act(async () => {
         screen.getByTestId('delete-project').click();
       });
 
-      // Then - Kitap silinmiş olmalı
+      // Then - Book should be deleted
       await waitFor(() => {
         expect(screen.queryByTestId(`project-${bookId}`)).not.toBeInTheDocument();
       });
@@ -516,10 +516,10 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle delete book error - non-existent book', async () => {
-      // Given - Mevcut kitabı direkt MongoDB ile ekle
+      // Given - Add existing book directly with MongoDB
       const savedBook = await booksDB.insertBook(testBooks[0]);
       const bookId = savedBook._id.toString();
-      // When - Bileşeni render et
+      // When - Render component
       render(
         <ProjectProvider>
           <TestComponent />
@@ -531,15 +531,15 @@ describe('ProjectContext Books Integration Tests', () => {
       });
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
 
-      // When - Kitabı doğrudan DB'den sil
+      // When - Delete book directly from DB first
       await booksDB.deleteBook(bookId);
 
-      // When - Sil butonuna tıkla
+      // When - Click delete button
       await act(async () => {
         screen.getByTestId('delete-project').click();
       });
 
-      // Then - Kitap sayısı değişmemeli
+      // Then - Book count should not change
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });
@@ -548,7 +548,7 @@ describe('ProjectContext Books Integration Tests', () => {
     });
 
     test('should handle delete with no books available', async () => {
-      // Given - Hiç kitap yokken
+      // Given - No books exist
       render(
         <ProjectProvider>
           <TestComponent />
@@ -560,12 +560,12 @@ describe('ProjectContext Books Integration Tests', () => {
       });
       const initialCount = parseInt(screen.getByTestId('books-count').textContent);
 
-      // When - Sil butonuna tıkla
+      // When - Click delete button
       await act(async () => {
         screen.getByTestId('delete-project').click();
       });
 
-      // Then - Kitap sayısı değişmemeli
+      // Then - Book count should not change
       await waitFor(() => {
         expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
       });

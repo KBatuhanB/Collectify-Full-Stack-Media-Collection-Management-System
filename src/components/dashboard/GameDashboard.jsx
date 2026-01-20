@@ -56,7 +56,7 @@ function GameDashboard() {
       }}
     >
       <Box sx={{ py: 4 }}>
-        {/* Modern başlık */}
+        {/* Modern header */}
         <Box
           sx={{
             textAlign: 'center',
@@ -102,14 +102,14 @@ function GameDashboard() {
               🎮 {DASHBOARD_TITLES.GAMES}
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 300 }}>
-              Oyun koleksiyonunuzu yönetin ve keşfedin
+              Manage and explore your game collection
             </Typography>
           </Box>
         </Box>
 
         <Grid container spacing={4} justifyContent="center" width="100%">
           <Grid item xs={12}>
-            {/* Üstte grafikler ve istatistik kartları yan yana */}
+            {/* Charts and statistics cards side by side */}
             <Box sx={{
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
@@ -119,7 +119,7 @@ function GameDashboard() {
               justifyContent: 'center',
               width: '100%'
             }}>
-              {/* Grafikler */}
+              {/* Charts */}
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
                 <Box sx={{
                   background: (theme) => theme.palette.mode === 'dark'
@@ -140,7 +140,7 @@ function GameDashboard() {
                 }}>
                   <UniversalChart 
                     data={games} 
-                    title="🎯 Tür Dağılımı"
+                    title="🎯 Genre Distribution"
                     type="doughnut"
                     dataKey="genre"
                     height={220}
@@ -166,7 +166,7 @@ function GameDashboard() {
                 }}>
                   <UniversalChart 
                     data={games} 
-                    title="📊 Durum Analizi"
+                    title="📊 Status Analysis"
                     type="pie"
                     dataKey="status"
                     labelTransform={(status) => {
@@ -178,7 +178,7 @@ function GameDashboard() {
                   />
                 </Box>
               </Box>
-              {/* İstatistik kartları 2x2 grid */}
+              {/* Statistics cards 2x2 grid */}
               <Box
                 sx={{
                   display: 'grid',
@@ -191,10 +191,10 @@ function GameDashboard() {
                   ml: { xs: 0, md: 4 }
                 }}
               >
-                {[ // kartlar eşit boyutlu
+                {[ // cards equal size
                   {
                     value: games.length,
-                    label: 'Toplam Oyun',
+                    label: 'Total Games',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)'
                       : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -202,7 +202,7 @@ function GameDashboard() {
                   },
                   {
                     value: games.filter(g => g.status === 'completed').length,
-                    label: 'Tamamlanan',
+                    label: 'Completed',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                       : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
@@ -210,7 +210,7 @@ function GameDashboard() {
                   },
                   {
                     value: games.filter(g => g.status === 'playing').length,
-                    label: 'Oynuyor',
+                    label: 'Playing',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
                       : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -221,7 +221,7 @@ function GameDashboard() {
                       ? (games.filter(g => g.rating > 0).reduce((sum, g) => sum + g.rating, 0) /
                         games.filter(g => g.rating > 0).length).toFixed(1)
                       : '0',
-                    label: 'Ortalama Puan',
+                    label: 'Avg. Rating',
                     bg: (theme) => theme.palette.mode === 'dark'
                       ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
                       : 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
@@ -245,7 +245,7 @@ function GameDashboard() {
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Typography variant="h5" data-testid={card.label === 'Ortalama Puan' ? 'average-rating-value' : undefined} sx={{ fontWeight: 800, mb: 0.5, fontSize: '1.3rem', color: card.color }}>
+                    <Typography variant="h5" data-testid={card.label === 'Avg. Rating' ? 'average-rating-value' : undefined} sx={{ fontWeight: 800, mb: 0.5, fontSize: '1.3rem', color: card.color }}>
                       {card.value}
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.95rem', color: card.color }}>
@@ -256,11 +256,11 @@ function GameDashboard() {
               </Box>
             </Box>
           </Grid>
-          {/* ProjectCard'lar bilgi kartlarıyla aynı satırda olmasın, ama yan yana dizilsin */}
+          {/* Project cards should not be on the same row as info cards, but displayed side by side */}
           <Grid item xs={12} sx={{ width: '100%' }}>
             {games.length === 0 ? (
-              // Hiç oyun yoksa gösterilecek boş durum
-              <Box sx={{ 
+              // Empty state when no games exist
+              <Box sx={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', 
                 minHeight: '500px', textAlign: 'center',
                 background: (theme) => theme.palette.mode === 'dark'
@@ -272,10 +272,10 @@ function GameDashboard() {
                   : '0 8px 32px rgba(0, 0, 0, 0.08)'
               }}>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
-                  Oyun Bulunamadı
+                  No Games Found
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 3, opacity: 0.8, color: 'text.secondary' }}>
-                  Henüz hiç oyun eklemediniz. Yeni bir oyun eklemek için butona tıklayın.
+                  You haven't added any games yet. Click the button to add a new game.
                 </Typography>
                 <Button 
                   variant="contained" 
@@ -299,7 +299,7 @@ function GameDashboard() {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 >
-                  Yeni Oyun Ekle
+                  Add New Game
                 </Button>
               </Box>
             ) : (
@@ -369,7 +369,7 @@ function GameDashboard() {
           <AddIcon fontSize="large" />
         </Fab>
 
-        {/* CSS animasyonu için global style */}
+        {/* Global style for CSS animation */}
         <style>
           {`
             @keyframes rotate {

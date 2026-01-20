@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// MongoDB Helper - direkt veritabanı işlemleri için
+// MongoDB Helper - for direct database operations
 const { cleanupAllTestData, closeDB } = require('./helpers/mongoHelper.js');
 
 import fs from 'fs';
@@ -10,24 +10,24 @@ const UPLOAD_API_URL = 'http://localhost:5000/api/uploads';
 
 describe('Upload API Integration Tests', () => {
 
-  // POST /uploads - Resim Yükleme
+  // POST /uploads - Image Upload
   describe('POST /uploads', () => {
     // Happy Path Tests
-    describe('Happy Path - Başarılı Yükleme', () => {
+    describe('Happy Path - Successful Upload', () => {
       test('should upload a valid image file successfully', async () => {
-        // Given - Geçerli resim dosyası
+        // Given - Valid image file
         const testImagePath = path.join(process.cwd(), 'src', 'test', 'test-image.jpg');
         const imageBuffer = fs.readFileSync(testImagePath);
         const formData = new FormData();
         const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
         formData.append('image', blob, 'test.jpg');
 
-        // When - Gerçek API'yi çağır
+        // When - Call real API
         const response = await axios.post(UPLOAD_API_URL, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        // Then - Başarılı yükleme response'u
+        // Then - Successful upload response
         expect(response).toMatchObject({
           status: 200,
           data: expect.objectContaining({
@@ -41,19 +41,19 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should upload PNG image successfully', async () => {
-        // Given - PNG formatında resim dosyası
+        // Given - PNG format image file
         const testImagePath = path.join(process.cwd(), 'src', 'test', 'test-image.jpg');
         const imageBuffer = fs.readFileSync(testImagePath);
         const formData = new FormData();
         const blob = new Blob([imageBuffer], { type: 'image/png' });
         formData.append('image', blob, 'image.png');
 
-        // When - PNG resim yükle
+        // When - Upload PNG image
         const response = await axios.post(UPLOAD_API_URL, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        // Then - PNG başarıyla yüklenmeli
+        // Then - PNG should be uploaded successfully
         expect(response).toMatchObject({
           status: 200,
           data: expect.objectContaining({
@@ -66,19 +66,19 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should upload GIF image successfully', async () => {
-        // Given - GIF formatında resim dosyası
+        // Given - GIF format image file
         const testImagePath = path.join(process.cwd(), 'src', 'test', 'test-image.jpg');
         const imageBuffer = fs.readFileSync(testImagePath);
         const formData = new FormData();
         const blob = new Blob([imageBuffer], { type: 'image/gif' });
         formData.append('image', blob, 'animation.gif');
 
-        // When - GIF resim yükle
+        // When - Upload GIF image
         const response = await axios.post(UPLOAD_API_URL, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        // Then - GIF başarıyla yüklenmeli
+        // Then - GIF should be uploaded successfully
         expect(response).toMatchObject({
           status: 200,
           data: expect.objectContaining({
@@ -91,19 +91,19 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should upload WEBP image successfully', async () => {
-        // Given - WEBP formatında resim dosyası
+        // Given - WEBP format image file
         const testImagePath = path.join(process.cwd(), 'src', 'test', 'test-image.jpg');
         const imageBuffer = fs.readFileSync(testImagePath);
         const formData = new FormData();
         const blob = new Blob([imageBuffer], { type: 'image/webp' });
         formData.append('image', blob, 'modern.webp');
 
-        // When - WEBP resim yükle
+        // When - Upload WEBP image
         const response = await axios.post(UPLOAD_API_URL, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        // Then - WEBP başarıyla yüklenmeli
+        // Then - WEBP should be uploaded successfully
         expect(response).toMatchObject({
           status: 200,
           data: expect.objectContaining({
@@ -117,12 +117,12 @@ describe('Upload API Integration Tests', () => {
     });
 
     // Unhappy Path Tests
-    describe('Unhappy Path - Yükleme Hataları', () => {
+    describe('Unhappy Path - Upload Errors', () => {
       test('should fail when no file is uploaded', async () => {
-        // Given - Boş FormData
+        // Given - Empty FormData
         const formData = new FormData();
 
-        // When & Then - Dosya olmadan yükleme girişimi başarısız olmalı
+        // When & Then - Upload attempt without file should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -136,13 +136,13 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should fail when file size exceeds 5MB limit', async () => {
-        // Given - 6MB boyutunda çok büyük dosya
+        // Given - 6MB oversized file
         const oversizeBuffer = Buffer.alloc(6 * 1024 * 1024, 'x'); // 6MB buffer
         const formData = new FormData();
         const blob = new Blob([oversizeBuffer], { type: 'image/jpeg' });
         formData.append('image', blob, 'toolarge.jpg');
 
-        // When & Then - Büyük dosya yükleme başarısız olmalı
+        // When & Then - Large file upload should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -155,13 +155,13 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should fail when uploading non-image file (PDF)', async () => {
-        // Given - PDF dosyası (resim olmayan dosya)
+        // Given - PDF file (non-image file)
         const pdfContent = Buffer.from('PDF test content');
         const formData = new FormData();
         const blob = new Blob([pdfContent], { type: 'application/pdf' });
         formData.append('image', blob, 'document.pdf');
 
-        // When & Then - PDF yükleme başarısız olmalı
+        // When & Then - PDF upload should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -174,13 +174,13 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should fail when uploading text file', async () => {
-        // Given - Metin dosyası
+        // Given - Text file
         const textContent = Buffer.from('text content');
         const formData = new FormData();
         const blob = new Blob([textContent], { type: 'text/plain' });
         formData.append('image', blob, 'file.txt');
 
-        // When & Then - Metin dosyası yükleme başarısız olmalı
+        // When & Then - Text file upload should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -193,13 +193,13 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should fail when uploading video file', async () => {
-        // Given - Video dosyası
+        // Given - Video file
         const videoContent = Buffer.from('video content');
         const formData = new FormData();
         const blob = new Blob([videoContent], { type: 'video/mp4' });
         formData.append('image', blob, 'video.mp4');
 
-        // When & Then - Video dosyası yükleme başarısız olmalı
+        // When & Then - Video file upload should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -212,13 +212,13 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should fail when uploading audio file', async () => {
-        // Given - Ses dosyası
+        // Given - Audio file
         const audioContent = Buffer.from('audio content');
         const formData = new FormData();
         const blob = new Blob([audioContent], { type: 'audio/mp3' });
         formData.append('image', blob, 'audio.mp3');
 
-        // When & Then - Ses dosyası yükleme başarısız olmalı
+        // When & Then - Audio file upload should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -232,34 +232,34 @@ describe('Upload API Integration Tests', () => {
     });
 
     // Edge Cases
-    describe('Edge Cases - Özel Durumlar', () => {
+    describe('Edge Cases - Special Scenarios', () => {
       test('should handle very small file (1 byte)', async () => {
-        // Given - Çok küçük (1 byte) resim dosyası
+        // Given - Very small (1 byte) image file
         const tinyBuffer = Buffer.from('x');
         const formData = new FormData();
         const blob = new Blob([tinyBuffer], { type: 'image/jpeg' });
         formData.append('image', blob, 'tiny.jpg');
 
-        // When - Küçük dosya yükle
+        // When - Upload small file
         const response = await axios.post(UPLOAD_API_URL, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        // Then - Küçük dosya başarıyla yüklenmeli
+        // Then - Small file should be uploaded successfully
         expect(response.status).toBe(200);
         expect(response.data.originalName).toBe('tiny.jpg');
         expect(response.data.size).toBeGreaterThan(0);
       });
 
       test('should handle empty file name', async () => {
-        // Given - Boş dosya adı
+        // Given - Empty file name
         const testImagePath = path.join(process.cwd(), 'src', 'test', 'test-image.jpg');
         const imageBuffer = fs.readFileSync(testImagePath);
         const formData = new FormData();
         const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
         formData.append('image', blob, '');
 
-        // When & Then - Boş isimli dosya durumu
+        // When & Then - Empty filename case
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -273,16 +273,16 @@ describe('Upload API Integration Tests', () => {
     });
 
     // Boundary Tests
-    describe('Boundary Tests - Sınır Değer Testleri', () => {
+    describe('Boundary Tests - Limit Value Tests', () => {
       test('should handle file exactly at 5MB limit', async () => {
-        // Given - Tam 5MB boyutunda dosya
+        // Given - File exactly 5MB in size
         const exactSize = 5 * 1024 * 1024; // Exactly 5MB
         const exactBuffer = Buffer.alloc(exactSize, 'x');
         const formData = new FormData();
         const blob = new Blob([exactBuffer], { type: 'image/jpeg' });
         formData.append('image', blob, 'exact5mb.jpg');
 
-        // When & Then - Tam limit boyutunda dosya
+        // When & Then - File at exact limit size
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -295,14 +295,14 @@ describe('Upload API Integration Tests', () => {
       });
 
       test('should fail for file 1 byte over 5MB limit', async () => {
-        // Given - 5MB + 1 byte boyutunda dosya
+        // Given - File 5MB + 1 byte in size
         const oversizeFile = 5 * 1024 * 1024 + 1; // 1 byte over 5MB
         const oversizeBuffer = Buffer.alloc(oversizeFile, 'x');
         const formData = new FormData();
         const blob = new Blob([oversizeBuffer], { type: 'image/jpeg' });
         formData.append('image', blob, 'oversize.jpg');
 
-        // When & Then - Limit aşan dosya başarısız olmalı
+        // When & Then - File exceeding limit should fail
         await expect(
           axios.post(UPLOAD_API_URL, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }

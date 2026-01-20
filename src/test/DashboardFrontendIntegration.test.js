@@ -14,11 +14,11 @@ const calcAverageString = (items) => {
   return avg.toFixed(1);
 };
 
-// Yardımcı: Dashboard'da data-testid="average-rating-value" olan değeri bulur
+// Helper: finds the value from data-testid="average-rating-value" in Dashboard
 const getAverageValueFromUI = async () => {
   const valueEl = await screen.findByTestId('average-rating-value');
   const valueText = valueEl?.textContent?.trim();
-  if (!valueText) throw new Error('Dashboardda Ortalama Puan değeri bulunamadı');
+  if (!valueText) throw new Error('Average Rating value not found in Dashboard');
   return valueText;
 };
 
@@ -27,26 +27,26 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
     cleanup();
   });
 
-  test('Books Dashboard - Ortalama Puan updates after adding rated books via API', async () => {
-  // Given: Mevcut kitaplar ve ortalama puanları (API'den alınır)
+  test('Books Dashboard - Average Rating updates after adding rated books via API', async () => {
+  // Given: Existing books and their average ratings (fetched from API)
     const beforeResp = await booksAPI.getAll();
     const beforeItems = beforeResp.data || [];
     const beforeAvg = calcAverageString(beforeItems);
 
-  // When: Dashboard'ı render et ve ilk "Ortalama Puan" değerinin backend ile aynı olduğunu doğrula
+  // When: Render Dashboard and verify initial "Average Rating" matches backend
     const { unmount } = render(
       <ProjectProvider>
         <BookDashboard />
       </ProjectProvider>
     );
 
-  // Then: UI'da ilk değer doğru gösteriliyor mu?
+  // Then: Is the initial value displayed correctly in UI?
     await waitFor(async () => {
       const uiAvg = await getAverageValueFromUI();
       expect(uiAvg).toBe(beforeAvg);
     });
 
-  // Given: Ortalama puanı değiştirecek iki yeni puanlı kitap ekle (gerçek API ile)
+  // Given: Add two new rated books to change average rating (using real API)
     const b1 = {
       title: `Avg Test Book A`,
       genre: 'Roman',
@@ -69,7 +69,7 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
       created.push(c1.data?._id);
       created.push(c2.data?._id);
 
-  // When: Backend'den güncel veriyi tekrar çek ve dashboard'ı yeniden render et
+  // When: Fetch updated data from backend and re-render dashboard
       const afterResp = await booksAPI.getAll();
       const afterItems = afterResp.data || [];
       const afterAvg = calcAverageString(afterItems);
@@ -81,14 +81,14 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
         </ProjectProvider>
       );
 
-  // Then: UI'da güncellenmiş ortalama puan doğru gösteriliyor mu?
+  // Then: Is the updated average rating displayed correctly in UI?
       await waitFor(async () => {
         const uiAvgAfter = await getAverageValueFromUI();
         expect(uiAvgAfter).toBe(afterAvg);
         expect(afterAvg).not.toBe(beforeAvg);
       });
     } finally {
-  // Temizlik: Oluşturulan kayıtları sil (veritabanı temiz kalsın)
+  // Cleanup: Delete created records (keep database clean)
       await Promise.all(
         created
           .filter(Boolean)
@@ -97,26 +97,26 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
     }
   });
 
-  test('Games Dashboard - Ortalama Puan updates after adding rated games via API', async () => {
-  // Given: Mevcut oyunlar ve ortalama puanları (API'den alınır)
+  test('Games Dashboard - Average Rating updates after adding rated games via API', async () => {
+  // Given: Existing games and their average ratings (fetched from API)
     const beforeResp = await gamesAPI.getAll();
     const beforeItems = beforeResp.data || [];
     const beforeAvg = calcAverageString(beforeItems);
 
-  // When: Dashboard'ı render et ve ilk "Ortalama Puan" değerinin backend ile aynı olduğunu doğrula
+  // When: Render Dashboard and verify initial "Average Rating" matches backend
     const { unmount } = render(
       <ProjectProvider>
         <GameDashboard />
       </ProjectProvider>
     );
 
-  // Then: UI'da ilk değer doğru gösteriliyor mu?
+  // Then: Is the initial value displayed correctly in UI?
     await waitFor(async () => {
       const uiAvg = await getAverageValueFromUI();
       expect(uiAvg).toBe(beforeAvg);
     });
 
-  // Given: Ortalama puanı değiştirecek iki yeni puanlı oyun ekle (gerçek API ile)
+  // Given: Add two new rated games to change average rating (using real API)
     const g1 = {
       title: `Avg Test Game A`,
       genre: 'RPG',
@@ -150,14 +150,14 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
         </ProjectProvider>
       );
 
-    // Then: UI'da güncellenmiş ortalama puan doğru gösteriliyor mu?
+    // Then: Is the updated average rating displayed correctly in UI?
       await waitFor(async () => {
         const uiAvgAfter = await getAverageValueFromUI();
         expect(uiAvgAfter).toBe(afterAvg);
         expect(afterAvg).not.toBe(beforeAvg);
       });
     } finally {
-  // Temizlik: Oluşturulan kayıtları sil (veritabanı temiz kalsın)
+  // Cleanup: Delete created records (keep database clean)
       await Promise.all(
         created
           .filter(Boolean)
@@ -166,36 +166,36 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
     }
   });
 
-  test('Series Dashboard - Ortalama Puan updates after adding rated movies via API', async () => {
-  // Given: Mevcut filmler ve ortalama puanları (API'den alınır)
+  test('Series Dashboard - Average Rating updates after adding rated movies via API', async () => {
+  // Given: Existing movies and their average ratings (fetched from API)
     const beforeResp = await moviesAPI.getAll();
     const beforeItems = beforeResp.data || [];
     const beforeAvg = calcAverageString(beforeItems);
 
-  // When: Dashboard'ı render et ve ilk "Ortalama Puan" değerinin backend ile aynı olduğunu doğrula
+  // When: Render Dashboard and verify initial "Average Rating" matches backend
     const { unmount } = render(
       <ProjectProvider>
         <SeriesDashboard />
       </ProjectProvider>
     );
 
-  // Then: UI'da ilk değer doğru gösteriliyor mu?
+  // Then: Is the initial value displayed correctly in UI?
     await waitFor(async () => {
       const uiAvg = await getAverageValueFromUI();
       expect(uiAvg).toBe(beforeAvg);
     });
 
-  // Given: Ortalama puanı değiştirecek iki yeni puanlı film ekle (gerçek API ile)
+  // Given: Add two new rated movies to change average rating (using real API)
     const m1 = {
       title: `Avg Test Movie A`,
-      genre: 'Aksiyon',
+      genre: 'Action',
       status: 'completed',
       rating: Number(beforeAvg) + 1,
       director: 'Integration Tester'
     };
     const m2 = {
       title: `Avg Test Movie B`,
-      genre: 'Aksiyon',
+      genre: 'Action',
       status: 'completed',
       rating: Number(beforeAvg) + 3,
       director: 'Integration Tester'
@@ -214,7 +214,7 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
 
 
       unmount();
-      // Chart.js ve jsdom çakışmasını önlemek için kısa bir bekleme ekle
+      // Add short delay to prevent Chart.js and jsdom conflict
       await Promise.resolve();
       render(
         <ProjectProvider>
@@ -222,14 +222,14 @@ describe('Dashboard Average Rating Integration (API → UI)', () => {
         </ProjectProvider>
       );
 
-  // Then: UI'da güncellenmiş ortalama puan doğru gösteriliyor mu?
+  // Then: Is the updated average rating displayed correctly in UI?
       await waitFor(async () => {
         const uiAvgAfter = await getAverageValueFromUI();
         expect(uiAvgAfter).toBe(afterAvg);
         expect(afterAvg).not.toBe(beforeAvg);
       });
     } finally {
-  // Temizlik: Oluşturulan kayıtları sil (veritabanı temiz kalsın)
+  // Cleanup: Delete created records (keep database clean)
       await Promise.all(
         created
           .filter(Boolean)
