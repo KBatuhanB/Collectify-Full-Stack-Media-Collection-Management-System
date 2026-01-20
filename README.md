@@ -1,9 +1,10 @@
 # Collectify: Full-Stack Media Collection Management System
 
-<img width="1827" height="1032" alt="src2" src="https://github.com/user-attachments/assets/fc03c1d8-ad34-4abe-b6eb-7b0cb511fea3" />
-<img width="1813" height="1036" alt="src 3" src="https://github.com/user-attachments/assets/d13e869e-3c92-4e78-940a-d104232ac3e2" />
-<img width="1822" height="1036" alt="src1" src="https://github.com/user-attachments/assets/6f8e2759-86b0-451e-bdd0-879e648f880d" />
-<img width="1820" height="1035" alt="src4" src="https://github.com/user-attachments/assets/cee0bc69-ee8f-4e61-9e83-8f16d8711fcd" />
+<img width="1999" height="1116" alt="kapak2" src="https://github.com/user-attachments/assets/9c9babfa-6653-4c6a-9773-4c56fdb129f5" />
+<img width="1829" height="1029" alt="moviepanel" src="https://github.com/user-attachments/assets/4b4dd9b8-ee0f-4646-8928-5d2922ee567d" />
+<img width="1829" height="1029" alt="dashboard2" src="https://github.com/user-attachments/assets/ec242ded-cfc5-4a57-b5a9-b8addf924ed6" />
+<img width="1829" height="1029" alt="dashboard" src="https://github.com/user-attachments/assets/d831162e-9b9a-4715-b792-b0013d5c3f37" />
+
 
 **A comprehensive web application demonstrating modern full-stack development practices**
 
